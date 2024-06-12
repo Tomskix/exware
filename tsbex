@@ -56,6 +56,11 @@ local WalkSpeedSlider = CombatTab:NewSlider("JumpPower", "", true, "/", {min = 5
     CombatSettings.TargetJP = value
 end)
 
+local HitBoxSlider = CombatTab:NewSlider("Hitbox Extender", "", true, "/", {min = 1, max = 15, default = 10W}, function(value)
+    game.Players.LocalPlayer.Character:FindFirstChild("Hitbox_LeftArm").Size = Vector3.new(value, value, value)
+    game.Players.LocalPlayer.Character:FindFirstChild("Hitbox_RightArm").Size = Vector3.new(value, value, value)
+end)
+
 local LagSec = CombatTab:NewSection("Lag Switch")
 local lagtoggle = CombatTab:NewToggle("Imcoming Lag", false, function(value)
     if value == true then
