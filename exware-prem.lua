@@ -25,7 +25,8 @@ CombatSettings = {
     IsStunEnabled = false,
     TargetJP = 50,
     FlingEnabled = false,
-    AutoBlock = false
+    AutoBlock = false,
+    Noclip = false
 }
 
 VisualSettings = {
@@ -48,6 +49,10 @@ local AutoBlockToggle = CombatTab:NewToggle("Auto Block", false, function(value)
     CombatSettings.AutoBlock = value
 end)
 
+local AntiFlingToggle = CombatTab:NewToggle("Noclip/Antifling", false, function(value)
+    CombatSettings.Noclip = value
+end)
+
 local WalkSpeedSlider = CombatTab:NewSlider("WalkSpeed", "", true, "/", {min = 1, max = 30, default = 3}, function(value)
     CombatSettings.TargetWS = value
 end)
@@ -55,6 +60,8 @@ end)
 local WalkSpeedSlider = CombatTab:NewSlider("JumpPower", "", true, "/", {min = 50, max = 500, default = 500}, function(value)
     CombatSettings.TargetJP = value
 end)
+
+
 
 local HitBoxSlider = CombatTab:NewSlider("Hitbox Extender", "", true, "/", {min = 1, max = 15, default = 10}, function(value)
     game.Players.LocalPlayer.Character:FindFirstChild("Hitbox_LeftArm").Size = Vector3.new(value, value, value)
@@ -173,6 +180,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 chr:TranslateBy(hum.MoveDirection * delta * 10)
             end
         end
+
+    if CombatSettings.Noclip then
+        for i,v in game.Players.LocalPlayer.Character:GetDescendants() do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
     if CombatSettings.FlingEnabled == true then 
     local abc = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
     game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(1,1,1) * (2^16)
