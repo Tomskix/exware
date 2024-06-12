@@ -1,0 +1,208 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Consistt/Ui/main/UnLeaked"))()
+local NetworkClient = cloneref(game:GetService("NetworkClient"))
+library.rank = "Guest"
+local Wm = library:Watermark("exware | v" .. library.version ..  " | " .. library:GetUsername() .. " | rank: " .. library.rank)
+
+
+local Notif = library:InitNotifications()
+
+local LoadingXSX = Notif:Notify("Loading ExWare please wait!.", 2, "LAST UPDATE 06/06/2024") 
+
+library.title = "ExWare"
+
+library:Introduction()
+wait(1)
+local Init = library:Init()
+
+local CombatTab = Init:NewTab("Combat")
+local VisualTab = Init:NewTab("Visuals")
+local CombatSection = CombatTab:NewSection("PVP")
+local VisualSection = VisualTab:NewSection("Visuals")
+
+CombatSettings = {
+    TargetWS = 3,
+    EnableWalkSpeed = false,
+    IsStunEnabled = false,
+    TargetJP = 50,
+    FlingEnabled = false,
+    AutoBlock = false
+}
+
+VisualSettings = {
+    HighlightDC = false,
+    ShowUlt = false,
+}
+
+local UseSpeedToggle = CombatTab:NewToggle("Use WalkSpeed", false, function(value)
+    CombatSettings.EnableWalkSpeed = value
+end):AddKeybind(Enum.KeyCode.LeftControl)
+local UseSpeedToggle = CombatTab:NewToggle("Use Fling", false, function(value)
+    CombatSettings.FlingEnabled = value
+end):AddKeybind(Enum.KeyCode.Z)
+
+local UseStunToggle = CombatTab:NewToggle("No Stun", false, function(value)
+    CombatSettings.IsStunEnabled = value
+end)
+
+local AutoBlockToggle = CombatTab:NewToggle("Auto Block", false, function(value)
+    CombatSettings.AutoBlock = value
+end)
+
+local WalkSpeedSlider = CombatTab:NewSlider("WalkSpeed", "", true, "/", {min = 1, max = 30, default = 3}, function(value)
+    CombatSettings.TargetWS = value
+end)
+
+local WalkSpeedSlider = CombatTab:NewSlider("JumpPower", "", true, "/", {min = 50, max = 500, default = 500}, function(value)
+    CombatSettings.TargetJP = value
+end)
+
+local LagSec = CombatTab:NewSection("Lag Switch")
+local lagtoggle = CombatTab:NewToggle("Imcoming Lag", false, function(value)
+    if value == true then
+        settings():GetService("NetworkSettings").IncomingReplicationLag = 5000
+    else
+        settings():GetService("NetworkSettings").IncomingReplicationLag = 0
+    end
+end):AddKeybind(Enum.KeyCode.LeftShift)
+
+local cchar
+
+local lagouttoggle = CombatTab:NewToggle("Outgoing Lag", false, function(value)
+    if value == true then
+
+        local s = Instance.new("Sound", workspace)
+        s.SoundId = "rbxassetid://8036843509"
+        s:Play()
+        local sky = Instance.new("Sky", game.Lighting)
+        sky.Name = "galaxy"
+        sky.SkyboxBk = "http://www.roblox.com/asset/?id=159454299"
+        sky.SkyboxDn = "http://www.roblox.com/asset/?id=159454299"
+        sky.SkyboxFt = "http://www.roblox.com/asset/?id=159454299"
+        sky.SkyboxLf = "http://www.roblox.com/asset/?id=159454299"
+        sky.SkyboxRt = "http://www.roblox.com/asset/?id=159454299"
+        sky.SkyboxUp = "http://www.roblox.com/asset/?id=159454299"
+        NetworkClient:SetOutgoingKBPSLimit(0.5)
+        cchar = game.Players.LocalPlayer.Character:Clone()
+        for i,v in cchar:GetDescendants() do
+            if v:IsA("Part") or v:IsA("BasePart") then
+                v.Anchored = true
+                v.CanCollide = false
+                v.Transparency = 0.8
+            end
+        end
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(10,0,0))
+        cchar.Parent = workspace.Live
+        
+
+        Instance.new("Highlight", cchar)
+    else
+        NetworkClient:SetOutgoingKBPSLimit(50000000000000000000)
+        if cchar then cchar:Destroy() end
+        local s = Instance.new("Sound", workspace)
+        s.SoundId = "rbxassetid://8036843509"
+        s:Play()
+        if game.Lighting:FindFirstChild("galaxy") then game.Lighting:FindFirstChild("galaxy"):Destroy() end
+    end
+end):AddKeybind(Enum.KeyCode.LeftShift)
+
+
+local ShowDCToggle = VisualTab:NewToggle("Show DeathCounter", false, function(value)
+    VisualSettings.HighlightDC = value
+end)
+local ShowDCToggle = VisualTab:NewToggle("Show Ultimates", false, function(value)
+    VisualSettings.ShowUlt = value
+end)
+
+workspace.Live.DescendantAdded:Connect(function(dec)
+    if dec.Name == "Counter" and VisualSettings.HighlightDC == true then
+        local dparent = dec.Parent
+        local a = Instance.new("Highlight", dec.Parent)
+        a.Name = "hdc" 
+        repeat
+            task.wait()
+        until dparent:FindFirstChild("Counter")==nil
+        a:Destroy()
+    end
+end)
+
+
+game.Players.LocalPlayer.Character.DescendantAdded:Connect(function(dec)
+    print(dec.ClassName)
+
+    if dec.Name == "RagdollSim" and CombatSettings.IsStunEnabled == true then
+        game.Players.LocalPlayer.Character:FindFirstChild("Torso").Anchored = true
+        repeat
+            wait()
+        until game.Players.LocalPlayer.Character:FindFirstChild("RagdollSim")==nil
+        repeat
+            game.Players.LocalPlayer.Character:FindFirstChild("Torso").Anchored = false
+            wait()
+        until game.Players.LocalPlayer.Character:FindFirstChild("Torso").Anchored == false
+    end
+
+    if dec.Name == "Freeze"or dec.Name == "NoRotate" or dec:IsA("BodyVelocity") or dec.Name == "RagdollSim" or dec.Name == "BeingGrabbed" and dec.Name == "Freeze" or dec.Name == "NoJump" or dec.Name == "NoBlock" or dec.Name == "M1ing" or dec.Name == "UsedDash" and CombatSettings.IsStunEnabled == true then
+        SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+        SetStateEnabled(Enum.HumanoidStateType.Running, true)
+        dec:Destroy()
+    end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    for i,v in workspace.Live:GetDescendants() do
+        if v:IsA("Highlight") and v.Parent:FindFirstChild("Humanoid") and v.Parent.Name ~= game.Players.LocalPlayer.Name and v.Name == "hdc" then
+            if (v.Parent:FindFirstChild("HumanoidRootPart").Position - game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude < 10 then
+                local newcf = CFrame.new(game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X + 5, game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y, game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z + 5)
+                game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = newcf
+            end
+        end
+    end
+        chr = game.Players.LocalPlayer.Character
+        hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+        hum.JumpPower = CombatSettings.TargetJP
+        hb = game:GetService("RunService").Heartbeat
+        local delta = hb:wait()
+        if hum.MoveDirection.Magnitude > 0 and CombatSettings.EnableWalkSpeed then
+            chr:TranslateBy(hum.MoveDirection * CombatSettings.TargetWS * delta * 10)
+        else
+            if CombatSettings.EnableWalkSpeed then
+                chr:TranslateBy(hum.MoveDirection * delta * 10)
+            end
+        end
+    if CombatSettings.FlingEnabled == true then 
+    local abc = game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity
+    game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(1,1,1) * (2^16)
+    game:GetService("RunService").RenderStepped:Wait()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = abc
+    end 
+end)
+
+workspace.Live.DescendantAdded:Connect(function(dec)
+    if dec.Name == "M1ing"  and CombatSettings.AutoBlock == true then
+        local TargetCharacterPos = dec.Parent:FindFirstChild("HumanoidRootPart").Position
+        local dparent = dec.Parent
+        local dname = dec.Name
+        print(dec.Name)
+        local lpos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position
+        if (lpos - TargetCharacterPos).Magnitude < 17 then
+            keypress(Enum.KeyCode.F)
+            repeat
+                task.wait()
+            until dparent:FindFirstChild(dname)==nil
+            keyrelease(Enum.KeyCode.F)
+        end
+    end
+end)
+
+ game.Players.DescendantAdded:Connect(function(dec)
+    if dec:IsA("Tool") and dec.Name == "Death Counter" or dec.Name == "The Final Hunt" or dec.Name == "Death Blow" or dec.Name == "Straight On" or dec.Name == "Sunset" or dec.Name == "Terrible Tornado" or dec.Name == "Incinerate" and VisualSettings.ShowUlt then
+        local uh = Instance.new("Highlight", dec.Parent.Parent.Character)
+        uh.Name = "Hult"
+        uh.FillColor = Color3.fromRGB(255,255,0)
+    end
+end)
+
+game.Players.DescendantRemoving:Connect(function(dec)
+    if dec:IsA("Tool") and dec.Name == "Death Counter" or dec.Name == "The Final Hunt" or dec.Name == "Death Blow" or dec.Name == "Straight On" or dec.Name == "Sunset" or dec.Name == "Terrible Tornado" or dec.Name == "Incinerate" and VisualSettings.ShowUlt and dec.Parent.Parent.Character:FindFirstChild("Hult") then
+        dec.Parent.Parent.Character:FindFirstChild("Hult"):Destroy()
+    end
+end)
