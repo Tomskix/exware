@@ -145,13 +145,7 @@ GunTab:NewToggle("No Spread", false, function(bool)
 end)
 
 MovementTab:NewToggle("Enable Infinite Jump", false, function(bool)
-    if bool then
-                for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
-        if v.Name == "MaxSpread" then
-                       v.Value = 0
-                end
-        end
-    end
+    MovementSettings.InfiniteJump = bool
 end)
 MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
     MovementSettings.UseSpeedHacks = bool
