@@ -1,0 +1,522 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = game:GetService("Workspace").CurrentCamera
+local HeadOffset = Vector3.new(0, 0.5, 0)
+local LegOffset = Vector3.new(0, 4, 0)
+local ArmOffset = Vector3.new(1, 0, 0)
+
+
+local ESPSettings = {
+    EspOn = false,
+    TracersOn = false,
+    FOV = 60,
+    RainbowGun = false
+}
+
+local AimbotCache = {
+    MouseDown = false,
+    target,
+    Aimbotsize = 90,
+    UseCircle = true
+}
+
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Consistt/Ui/main/UnLeaked"))()
+library.title = "ExWare - Arsenal"
+library:Introduction()
+local Window = library:Init()
+
+local CombatTab = Window:NewTab("Combat")
+local AimbotSec = CombatTab:NewSection("Aimbot")
+local VisTab = Window:NewTab("Visuals")
+local ESPSec = VisTab:NewSection("ESP")
+local MovementTab = Window:NewTab("Movement")
+local MoveSec = MovementTab:NewSection("Movement")
+local GunTab = Window:NewTab("Gun Mods")
+local GunSec = GunTab:NewSection("Gun Mods")
+
+local MovementSettings = {
+    UseSpeedHacks = false,
+    Speed = 1,
+    InfiniteJump = false,
+    SpinBot = false,
+}
+
+GunTab:NewLabel("plan to see more here...", "left")
+
+GunTab:NewToggle("Infinite Ammo", false, function(bool)
+    if bool then
+        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount.Value = 999
+        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
+    end
+end)
+
+GunTab:NewToggle("No Reload", false, function(bool)
+    if bool then
+                for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+                if v.Name == "ReloadTime" then
+                      v.Value = 0.1
+                end
+        end
+    end
+end)
+
+GunTab:NewToggle("Sonic FireRate", false, function(bool)
+    if bool then
+                for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+                if v.Name == "FireRate" then
+                       v.Value = 0.05
+                end
+        end
+    end
+end)
+
+GunTab:NewToggle("No Recoil", false, function(bool)
+    if bool then
+                for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+                 if v.Name == "RecoilControl" then
+                       v.Value = 0
+                 end
+        end
+    end
+end)
+
+GunTab:NewToggle("No Spread", false, function(bool)
+    GunMods.RecoilControl = bool
+end)
+
+MovementTab:NewToggle("Enable Infinite Jump", false, function(bool)
+    if bool then
+                for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+        if v.Name == "MaxSpread" then
+                       v.Value = 0
+                end
+        end
+    end
+end)
+MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
+    MovementSettings.UseSpeedHacks = bool
+end)
+
+MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, function(value)
+    MovementSettings.Speed = value
+end)
+
+
+local CombatSettings = {
+    Aimbot = false,
+    TeamCheck = true,
+    HitPart = "Head",
+    ExpandHitboxes = false,
+}
+
+local AimbotCircle = Drawing.new("Circle")
+AimbotCircle.Filled = false
+AimbotCircle.Thickness = 1
+AimbotCircle.Color = Color3.fromRGB(255,255,255)
+AimbotCircle.Radius = AimbotCache.Aimbotsize
+AimbotCircle.Visible = false
+AimbotCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+local ast =  Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
+
+CombatTab:NewToggle("Enable Aimbot", false, function(bool)
+    CombatSettings.Aimbot = bool
+    AimbotCircle.Visible = bool
+end)
+CombatTab:NewToggle("Enable TeamCheck", true, function(bool)
+    CombatSettings.TeamCheck = bool
+end)
+CombatTab:NewSelector("HitPart", "Adjust your Hitpart", {"Head", "HumanoidRootPart"}, function(d)
+    CombatSettings.HitPart = d
+end)
+
+CombatTab:NewSlider("Aimbot FOV", "", true, "/", {min = 30, max = 360, default = 90}, function(value)
+    AimbotCircle.Radius = value
+    AimbotCache.Aimbotsize = value
+end)
+local BalantSec = CombatTab:NewSection("Balant")
+CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
+    CombatSettings.ExpandHitboxes = bool
+end)
+local NetworkClient = cloneref(game:GetService("NetworkClient"))
+CombatTab:NewToggle("Lagswitch", false, function(bool)
+    if bool then
+        NetworkClient:SetOutgoingKBPSLimit(0.5)
+    else
+        NetworkClient:SetOutgoingKBPSLimit(99999999999999999999)
+    end
+end)
+
+
+VisTab:NewToggle("Box ESP", false, function(bool)
+    ESPSettings.EspOn = bool
+end)
+
+VisTab:NewToggle("Tracer ESP", false, function(bool)
+    ESPSettings.TracersOn = bool
+end)
+
+local ModSec = VisTab:NewSection("Mods")
+
+VisTab:NewSlider("Camera FOV", "", true, "/", {min = 30, max = 180, default = 60}, function(value)
+    ESPSettings.FOV = value
+end)
+
+VisTab:NewToggle("Rainbow Gun", false, function(bool)
+    ESPSettings.RainbowGun = bool
+end)
+
+function GetClosestPlayer(FOV)
+    local plr
+    local Mouse = LocalPlayer:GetMouse()
+    local MPos = Mouse.Hit.Position
+    local dist = math.huge
+    for i,v in Players:GetPlayers() do
+        if v.Team ~= LocalPlayer.Team or not CombatSettings.TeamCheck and v ~= LocalPlayer then
+            local char = v.Character
+            local charpartpos, onscreen = workspace.CurrentCamera:WorldToViewportPoint(char.Head.Position)
+            if onscreen then
+                local mag = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(charpartpos.X, charpartpos.Y)).Magnitude
+                if mag < dist and mag < FOV then
+                    dist = mag 
+                    plr = v
+                end
+            end
+        end
+    end
+    return plr, dist
+end
+
+
+
+local TracersStart = Vector2.new(game.Workspace.CurrentCamera.ViewportSize.X / 2, game.Workspace.CurrentCamera.ViewportSize.Y)
+
+
+for i,v in pairs(Players:GetChildren()) do
+    local TracerLine = Drawing.new("Line")
+    TracerLine.Transparency = 1
+    TracerLine.Thickness = 1
+    TracerLine.From = TracersStart
+    TracerLine.Color = Color3.fromRGB(255,255,255)
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = false
+    BoxOutline.Color = Color3.fromRGB(255,255,255)
+    BoxOutline.Thickness = 1
+    BoxOutline.Transparency = 1
+    BoxOutline.Filled = false
+    local Box = Drawing.new("Square")
+    Box.Visible = false
+    Box.Color = Color3.fromRGB(255,255,255)
+    Box.Thickness = 1
+    Box.Transparency = 1
+    Box.Filled = false
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = 1
+    HealthBarOutline.Filled = false
+    HealthBarOutline.Color = Color3.fromRGB(0,0,0)
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Visible = false
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = 1
+    HealthBar.Filled = false
+    HealthBar.Color = Color3.fromRGB(0,255,0)
+    HealthBar.Transparency = 1
+    HealthBar.Visible = true
+
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            workspace.Camera.FieldOfView = ESPSettings.FOV
+            if ESPSettings.EspOn and v.Character ~= nil and v.Team ~= LocalPlayer.Team or not CombatSettings.TeamCheck and v ~= LocalPlayer and v.Character:FindFirstChild("HumanoidRootPart") then
+                local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character:FindFirstChild("Head").Position)
+                local RootPart = v.Character:FindFirstChild("HumanoidRootPart")
+                
+                local Head = v.Character:FindFirstChild("Head")
+                local RootPosition, RootVis = Camera:WorldToViewportPoint(RootPart.Position)
+                local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
+                local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
+                if OnScreen == true then
+                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+
+                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+                    print("Here")
+                    HealthBarOutline.Size = Vector2.new(0, HeadPosition.Y - LegPosition.Y)
+                    HealthBarOutline.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBarOutline.Visible = true
+                    print("No HEre!")
+                    HealthBar.Size = Vector2.new(0, (HeadPosition.Y - LegPosition.Y) / (100 / math.clamp(100, 0, v:WaitForChild("NRPBS").Health.Value)))
+                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBar.Visible = true
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    HealthBar.Visible = false
+                    HealthBarOutline.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                HealthBar.Visible = false
+                HealthBarOutline.Visible = false
+                TracerLine.Visible = false
+            end
+        end)
+
+    end
+    function LineESP()
+        if v.Character and v.Character.HumanoidRootPart and v.Character.Humanoid then
+            game:GetService("RunService").RenderStepped:Connect(function()
+                local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character:FindFirstChild("Head").Position)
+                local RootPart = v.Character:FindFirstChild("HumanoidRootPart")
+                local Head = v.Character:FindFirstChild("Head")
+                local RootPosition, RootVis = Camera:WorldToViewportPoint(RootPart.Position)
+                local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
+                local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
+
+                if OnScreen and ESPSettings.TracersOn then
+                    TracerLine.To = Vector2.new(RootPosition.X, RootPosition.Y)
+                    TracerLine.From = TracersStart
+                    TracerLine.Visible = true
+                else
+                    TracerLine.Visible = false
+                end
+                if v.Team == LocalPlayer.Team then TracerLine.Visible = false end
+            end)
+        else
+            TracerLine.Visible = false
+        end
+    end
+    coroutine.wrap(LineESP)()
+    coroutine.wrap(boxesp)()
+end
+
+Players.PlayerAdded:Connect(function(v)
+    local TracerLine = Drawing.new("Line")
+    TracerLine.Transparency = 1
+    TracerLine.Thickness = 1
+    TracerLine.From = TracersStart
+    TracerLine.Color = Color3.fromRGB(255,255,255)
+    TracerLine.Visible = false
+
+
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = false
+    BoxOutline.Color = Color3.fromRGB(255,255,255)
+    BoxOutline.Thickness = 1
+    BoxOutline.Transparency = 1
+    BoxOutline.Filled = false
+    local Box = Drawing.new("Square")
+    Box.Visible = false
+    Box.Color = Color3.fromRGB(255,255,255)
+    Box.Thickness = 1
+    Box.Transparency = 1
+    Box.Filled = false
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = 1
+    HealthBarOutline.Filled = false
+    HealthBarOutline.Color = Color3.fromRGB(0,0,0)
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Visible = false
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = 1
+    HealthBar.Filled = false
+    HealthBar.Color = Color3.fromRGB(0,255,0)
+    HealthBar.Transparency = 1
+    HealthBar.Visible = false
+
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            workspace.Camera.FieldOfView = ESPSettings.FOV
+            if ESPSettings.EspOn and v.Character ~= nil and v.Team ~= LocalPlayer.Team or not CombatSettings.TeamCheck and v ~= LocalPlayer and v.Character:FindFirstChild("HumanoidRootPart") then
+                local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character:FindFirstChild("Head").Position)
+                local RootPart = v.Character:FindFirstChild("HumanoidRootPart")
+                
+                local Head = v.Character:FindFirstChild("Head")
+                local RootPosition, RootVis = Camera:WorldToViewportPoint(RootPart.Position)
+                local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
+                local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
+                if OnScreen == true then
+                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+
+                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+                    print("Here")
+                    HealthBarOutline.Size = Vector2.new(0, HeadPosition.Y - LegPosition.Y)
+                    HealthBarOutline.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBarOutline.Visible = true
+                    print("No HEre!")
+                    HealthBar.Size = Vector2.new(0, (HeadPosition.Y - LegPosition.Y) / (100 / math.clamp(100, 0, v:WaitForChild("NRPBS").Health.Value)))
+                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBar.Visible = true
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    HealthBar.Visible = false
+                    HealthBarOutline.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                HealthBar.Visible = false
+                HealthBarOutline.Visible = false
+            end
+        end)
+        end
+    function LineESP()
+    repeat
+        task.wait()
+    until v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid")
+
+    -- Create a tracer line for the player
+    local TracerLine = Drawing.new("Line")
+    TracerLine.Thickness = 1
+    TracerLine.Color = Color3.fromRGB(255, 255, 255)
+    TracerLine.Transparency = 1
+    TracerLine.Visible = false
+
+    -- Connect to the RenderStepped event to update the tracer line each frame
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") then
+                local head = v.Character:FindFirstChild("Head")
+                local rootPart = v.Character:FindFirstChild("HumanoidRootPart")
+
+                if head and rootPart then
+                    local headPosition, onScreen = Camera:WorldToViewportPoint(head.Position)
+                    local rootPosition = Camera:WorldToViewportPoint(rootPart.Position)
+
+                    if onScreen and ESPSettings.TracersOn then
+                        TracerLine.To = Vector2.new(rootPosition.X, rootPosition.Y)
+                        TracerLine.From = TracersStart
+                        TracerLine.Visible = true
+                    else
+                        TracerLine.Visible = false
+                    end
+
+                    if v.Team == LocalPlayer.Team then
+                        TracerLine.Visible = false
+                    end
+                else
+                    TracerLine.Visible = false
+                end
+            else
+                TracerLine.Visible = false
+            end
+        end)
+    end
+
+    coroutine.wrap(LineESP)()
+    coroutine.wrap(boxesp)()
+end)
+
+local c = 1
+function zigzag(X)
+ return math.acos(math.cos(X * math.pi)) / math.pi
+end
+game:GetService("RunService").RenderStepped:Connect(function()
+ if game.Workspace.Camera:FindFirstChild('Arms') and ESPSettings.RainbowGun then
+  for i,v in pairs(game.Workspace.Camera.Arms:GetDescendants()) do
+   if v.ClassName == 'MeshPart' then 
+    v.Transparency = 0.5
+    v.Color = Color3.fromHSV(zigzag(c),1,1)
+    c = c + .0001
+   end
+  end
+ end
+end)
+
+
+
+
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if AimbotCache.MouseDown and CombatSettings.Aimbot  then
+        if AimbotCache.target and AimbotCache.target:FindFirstChild("NRPBS").Health.Value > 0 then
+            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).Position)
+        else
+            if not AimbotCache.target then
+                AimbotCache.target, cacaca = GetClosestPlayer(AimbotCache.Aimbotsize)
+            end 
+        end
+    end
+    chr = game.Players.LocalPlayer.Character
+    hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+    hb = game:GetService("RunService").Heartbeat
+    local delta = hb:wait()
+    if hum.MoveDirection.Magnitude > 0 and MovementSettings.UseSpeedHacks then
+        chr:TranslateBy(hum.MoveDirection * MovementSettings.Speed * delta * 10)
+    else
+        if MovementSettings.UseSpeedHacks then
+            chr:TranslateBy(hum.MoveDirection * delta * 10)
+        end
+    end
+    if CombatSettings.ExpandHitboxes == true then
+        for i,v in Players:GetPlayers() do
+            if v ~= LocalPlayer then
+            v.Character.RightUpperLeg.CanCollide = false
+            v.Character.RightUpperLeg.Transparency = 10
+            v.Character.RightUpperLeg.Size = Vector3.new(13,13,13)
+            
+            v.Character.LeftUpperLeg.CanCollide = false
+            v.Character.LeftUpperLeg.Transparency = 10
+            v.Character.LeftUpperLeg.Size = Vector3.new(13,13,13)
+            
+            v.Character.HeadHB.CanCollide = false
+            v.Character.HeadHB.Transparency = 10
+            v.Character.HeadHB.Size = Vector3.new(13,13,13)
+            
+            v.Character.HumanoidRootPart.CanCollide = false
+            v.Character.HumanoidRootPart.Transparency = 10
+            v.Character.HumanoidRootPart.Size = Vector3.new(13,13,13)
+            end
+        end
+    else
+        for i,v in Players:GetPlayers() do
+            v.Character.RightUpperLeg.CanCollide = false
+            v.Character.RightUpperLeg.Transparency = 10
+            v.Character.RightUpperLeg.Size = Vector3.new(3,3,3)
+            
+            v.Character.LeftUpperLeg.CanCollide = false
+            v.Character.LeftUpperLeg.Transparency = 10
+            v.Character.LeftUpperLeg.Size = Vector3.new(3,3,3)
+            
+            v.Character.HeadHB.CanCollide = false
+            v.Character.HeadHB.Transparency = 10
+            v.Character.HeadHB.Size = Vector3.new(3,3,3)
+            
+            v.Character.HumanoidRootPart.CanCollide = false
+            v.Character.HumanoidRootPart.Transparency = 10
+            v.Character.HumanoidRootPart.Size = Vector3.new(3,3,3)
+        end
+    end
+end)
+
+
+
+
+LocalPlayer:GetMouse().Button2Down:Connect(function()
+    local localt
+    local locald 
+    localt, locald = GetClosestPlayer(AimbotCache.Aimbotsize)
+    AimbotCache.target = localt
+    AimbotCache.MouseDown = true
+    warn(Dist)
+end)
+
+LocalPlayer:GetMouse().Button2Up:Connect(function()
+    AimbotCache.target = nil
+    AimbotCache.MouseDown = false
+end)
+
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if MovementSettings.InfiniteJump then
+        game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
