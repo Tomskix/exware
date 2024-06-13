@@ -198,6 +198,8 @@ local CombatSettings = {
     TeamCheck = true,
     HitPart = "Head",
     ExpandHitboxes = false,
+    Triggerbot = false,
+    TriggerSize = 30
 }
 
 local AimbotCircle = Drawing.new("Circle")
@@ -206,7 +208,16 @@ AimbotCircle.Thickness = 1
 AimbotCircle.Color = Color3.fromRGB(255,255,255)
 AimbotCircle.Radius = AimbotCache.Aimbotsize
 AimbotCircle.Visible = false
+
+local TriggerCircle = Drawing.new("Circle")
+TriggerCircle.Filled = false
+TriggerCircle.Thickness = 1
+TriggerCircle.Color = Color3.fromRGB(255,0,0)
+TriggerCircle.Radius = CombatSettings.TriggerSize
+TriggerCircle.Visible = false
+
 local usecircle = true
+TriggerCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 AimbotCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 local ast =  Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
@@ -228,6 +239,49 @@ end)
 CombatTab:NewToggle("Enable TeamCheck", true, function(bool)
     CombatSettings.TeamCheck = bool
 end)
+
+local function checkNoWallsBetween(player1, player2)
+    local character1 = player1.Character
+    local character2 = player2.Character
+    
+    if not character1 or not character2 then
+        return false
+    end
+    
+    local part1 = character1.PrimaryPart
+    local part2 = character2.PrimaryPart
+    
+    if not part1 or not part2 then
+        return false
+    end
+    
+
+    local direction = (part2.Position - part1.Position).unit
+    
+
+    local ray = Ray.new(part1.Position, direction * (part2.Position - part1.Position).magnitude)
+    local hitPart, hitPosition = game.Workspace:FindPartOnRay(ray, player1.Character, false, true)
+    
+    
+    if hitPart and hitPart:IsA("BasePart") then
+        if hitPart:IsDescendantOf(player1.Character) or hitPart:IsDescendantOf(player2.Character) then
+            return true
+        end
+    end
+    
+    return false
+end
+
+CombatTab:NewToggle("Enable Triggerbot", false, function(bool)
+    CombatSettings.Triggerbot = bool
+    TriggerCircle.Visible = bool
+end)
+
+CombatTab:NewSlider("Triggerbot Size", "", true, "/", {min = 5, max = 90, default = 30}, function(value)
+    TriggerCircle.Radius = value
+    CombatSettings.TriggerSize = value
+end)
+
 CombatTab:NewSelector("HitPart", "Adjust your Hitpart", {"Head", "HumanoidRootPart"}, function(d)
     CombatSettings.HitPart = d
 end)
@@ -236,6 +290,8 @@ CombatTab:NewSlider("Aimbot FOV", "", true, "/", {min = 30, max = 360, default =
     AimbotCircle.Radius = value
     AimbotCache.Aimbotsize = value
 end)
+
+
 local BalantSec = CombatTab:NewSection("Balant")
 CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
     CombatSettings.ExpandHitboxes = bool
@@ -721,6 +777,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
             v.Character.HumanoidRootPart.CanCollide = false
             v.Character.HumanoidRootPart.Transparency = 10
             v.Character.HumanoidRootPart.Size = Vector3.new(3,3,3)
+        end
+    end
+    if CombatSettings.Triggerbot == true then
+        if checkNoWallsBetween(LocalPlayer, GetClosestPlayer(CombatSettings.TriggerSize)) then
+            mouse1click()
         end
     end
     if MovementSettings.BunnyHop and LocalPlayer.Character.Humanoid.Jump == false then LocalPlayer.Character.Humanoid.Jump = true end
