@@ -6,6 +6,66 @@ local LegOffset = Vector3.new(0, 4, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
 
 
+local spinning = false
+
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local camera = game.Workspace.CurrentCamera
+local followBlock
+local spin
+local spinspeed = 30
+
+-- Function to create a new part
+local function createFollowBlock()
+    local followBlock = Instance.new("Part")
+    followBlock.Name = "FollowBlock"
+    followBlock.Size = Vector3.new(2, 2, 2)
+    followBlock.Anchored = true
+    followBlock.CanCollide = false
+    followBlock.Transparency = 1
+    followBlock.Parent = workspace
+    return followBlock
+end
+
+-- Function to update the block's position
+local function updateBlockPosition()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local newPosition = humanoidRootPart.Position + Vector3.new(-2, 4, 0)
+    followBlock.CFrame = CFrame.new(newPosition)
+    camera.CameraSubject = followBlock
+end
+
+
+local function toggleSpinningAndFollowing()
+    spinning = not spinning
+
+    if spinning then
+        spin = Instance.new("BodyAngularVelocity")
+        spin.Name = "Spinning"
+        spin.Parent = character:WaitForChild("HumanoidRootPart")
+        spin.MaxTorque = Vector3.new(0, math.huge, 0)
+        spin.AngularVelocity = Vector3.new(0, spinspeed, 0)
+
+
+        followBlock = createFollowBlock()
+
+        game:GetService("RunService").RenderStepped:Connect(updateBlockPosition)
+    else
+        if spin then
+            spin:Destroy()
+            spin = nil
+        end
+
+        if followBlock then
+            followBlock:Destroy()
+            followBlock = nil
+        end
+
+        camera.CameraSubject = character:WaitForChild("Humanoid")
+    end
+end
+
 local ESPSettings = {
     EspOn = false,
     TracersOn = false,
@@ -38,7 +98,7 @@ local MovementSettings = {
     UseSpeedHacks = false,
     Speed = 1,
     InfiniteJump = false,
-    SpinBot = false,
+    BunnyHop = false,
 }
 
 GunTab:NewLabel("plan to see more here...", "left")
@@ -100,7 +160,16 @@ end)
 MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, function(value)
     MovementSettings.Speed = value
 end)
+MovementTab:NewToggle("Enable Spinbot", false, function(bool)
+    toggleSpinningAndFollowing()
+end)
+MovementTab:NewSlider("Spin Speed", "", true, "/", {min = 5, max = 50, default = 5}, function(value)
+    spinspeed = value
+end)
 
+MovementTab:NewToggle("BunnyHop", false, function(bool)
+    MovementSettings.BunnyHop = bool
+end)
 
 local CombatSettings = {
     Aimbot = false,
@@ -495,6 +564,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             v.Character.HumanoidRootPart.Size = Vector3.new(3,3,3)
         end
     end
+    if MovementSettings.BunnyHop and LocalPlayer.Character.Humanoid.Jump == false then LocalPlayer.Character.Humanoid.Jump = true end
 end)
 
 
