@@ -102,11 +102,34 @@ local MovementSettings = {
 }
 
 GunTab:NewLabel("plan to see more here...", "left")
-
+local useinfammo = false
 GunTab:NewToggle("Infinite Ammo", false, function(bool)
-    if bool then
-        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount.Value = 999
+    game:GetService('RunService').PreRender:Connect(function()
+        print("ammo go brrrrrrrrr")
+        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount.Value = 999    
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
+    end)
+end)
+GunTab:NewToggle("Infinite Range", false, function(bool)
+    if bool then
+        for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+            if v.Name == "Range" then
+                v.Value = 1000000000000000
+            end
+        end
+    end
+end)
+
+
+GunTab:NewToggle("Explosive Ammo", false, function(bool)
+    if bool then
+        for i, v in pairs(game.ReplicatedStorage.Weapons:GetChildren()) do
+            if v:FindFirstChild("Projectile")==nil then
+                if v:FindFirstChild("Tags")~=nil then
+                    if v:FindFirstChild("Tags"):FindFirstChild("WeaponType") then v:FindFirstChild("Tags"):FindFirstChild("WeaponType").Value = "Explosive" end
+                end
+            end
+        end
     end
 end)
 
@@ -126,6 +149,7 @@ GunTab:NewToggle("Sonic FireRate", false, function(bool)
                 if v.Name == "FireRate" then
                        v.Value = 0.05
                 end
+                if v.Name == "Auto" then v.Value = true end
         end
     end
 end)
@@ -141,7 +165,11 @@ GunTab:NewToggle("No Recoil", false, function(bool)
 end)
 
 GunTab:NewToggle("No Spread", false, function(bool)
-    GunMods.RecoilControl = bool
+            for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
+        if v.Name == "MaxSpread" then
+                       v.Value = 0
+                end
+        end
 end)
 
 MovementTab:NewToggle("Enable Infinite Jump", false, function(bool)
@@ -178,12 +206,24 @@ AimbotCircle.Thickness = 1
 AimbotCircle.Color = Color3.fromRGB(255,255,255)
 AimbotCircle.Radius = AimbotCache.Aimbotsize
 AimbotCircle.Visible = false
+local usecircle = true
 AimbotCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 local ast =  Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
 CombatTab:NewToggle("Enable Aimbot", false, function(bool)
     CombatSettings.Aimbot = bool
-    AimbotCircle.Visible = bool
+    if usecircle == true then
+        AimbotCircle.Visible = bool
+    end
+end)
+CombatTab:NewToggle("Show Circle", true, function(bool)
+    usecircle = bool
+    if AimbotCircle.Visible == true and usecircle == false then
+        AimbotCircle.Visible = false
+    end
+    if AimbotCircle.Visible == false and usecircle == true and CombatSettings.Aimbot == true then
+        AimbotCircle.Visible = true
+    end
 end)
 CombatTab:NewToggle("Enable TeamCheck", true, function(bool)
     CombatSettings.TeamCheck = bool
@@ -209,6 +249,128 @@ CombatTab:NewToggle("Lagswitch", false, function(bool)
     end
 end)
 
+local esp_settings = {
+    textsize = 16,  
+    colour = Color3.fromRGB(255, 255, 255)  
+}
+-- found this from my old script lmfao
+local espEnabled = false  
+
+
+local function calculateDistance(point1, point2)
+    return (point1 - point2).magnitude
+end
+
+
+local function updateESP(player)
+    if espEnabled and player ~= game.Players.LocalPlayer and player.Team ~= game.Players.LocalPlayer.Team then
+        local character = player.Character
+        if character and character:FindFirstChild("Head") then
+            local head = character.Head
+            local headPosition = head.Position
+            local localPlayerHeadPosition = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.Head and game.Players.LocalPlayer.Character.Head.Position
+            
+            if localPlayerHeadPosition then
+                local distance = calculateDistance(localPlayerHeadPosition, headPosition)
+                
+                local existingESP = head:FindFirstChild("CrackedESP")
+                if not existingESP then
+                    local gui = Instance.new("BillboardGui")
+                    gui.Name = "CrackedESP"
+                    gui.ResetOnSpawn = false
+                    gui.AlwaysOnTop = true
+                    gui.Size = UDim2.new(1.75, 0, 1.75, 0)
+                    gui.StudsOffset = Vector3.new(0, 3, 0) 
+                    gui.Adornee = head
+                    
+                    local esp = Instance.new("TextLabel", gui)
+                    esp.BackgroundTransparency = 1
+                    esp.Size = UDim2.new(1, 0, 1, 0)
+                    esp.BorderSizePixel = 0
+                    esp.Font = Enum.Font.SourceSansBold
+                    esp.TextSize = esp_settings.textsize
+                    esp.TextColor3 = esp_settings.colour
+                    esp.TextStrokeTransparency = 0.5
+                    esp.TextStrokeColor3 = Color3.new(0, 0, 0)
+                    esp.Text = player.DisplayName .. "\nDistance: " .. math.floor(distance) .. " studs"
+                    
+                    gui.Parent = head
+                else
+                    -- Update existing ESP with player display name and distance
+                    existingESP.TextLabel.Text = player.DisplayName .. "\nDistance: " .. math.floor(distance) .. " studs"
+                end
+            end
+        end
+    else
+        local character = player.Character
+        if character then
+            local head = character:FindFirstChild("Head")
+            if head then
+                local existingESP = head:FindFirstChild("CrackedESP")
+                if existingESP then
+                    existingESP:Destroy()
+                end
+            end
+        end
+    end
+end
+
+local function toggleESP()
+    espEnabled = not espEnabled
+    if espEnabled then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            updateESP(player)
+        end
+    else
+        -- Disable ESP, remove all existing ESPs
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            local character = player.Character
+            if character then
+                local head = character:FindFirstChild("Head")
+                if head then
+                    local existingESP = head:FindFirstChild("CrackedESP")
+                    if existingESP then
+                        existingESP:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+
+-- Connect updateESP function to handle player changes (join, leave, team change)
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        updateESP(player)
+    end)
+    
+    player.CharacterRemoving:Connect(function(character)
+        local existingESP = character:FindFirstChild("CrackedESP")
+        if existingESP then
+            existingESP:Destroy()
+        end
+    end)
+    
+    player:GetPropertyChangedSignal("Team"):Connect(function()
+        updateESP(player)
+    end)
+end)
+
+-- Connect updateESP function to update distances periodically
+game:GetService("RunService").RenderStepped:Connect(function()
+    if espEnabled then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            updateESP(player)
+        end
+    end
+end)
+
+-- Initial setup for existing players
+for _, player in ipairs(game.Players:GetPlayers()) do
+    updateESP(player)
+end
 
 VisTab:NewToggle("Box ESP", false, function(bool)
     ESPSettings.EspOn = bool
@@ -216,6 +378,9 @@ end)
 
 VisTab:NewToggle("Tracer ESP", false, function(bool)
     ESPSettings.TracersOn = bool
+end)
+VisTab:NewToggle("Show Distance", false, function(bool)
+    toggleESP()
 end)
 
 local ModSec = VisTab:NewSection("Mods")
@@ -583,4 +748,3 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
         game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
-
