@@ -14,16 +14,6 @@ local followBlock
 local spin = false
 local spinspeed = 30
 
-local foldername = "exware"
-local fileconfig = foldername.."//arsenalconfigs"
-local skinfileconfig = foldername.."//arsenalskinconfig"
-local weaponfileconfig = foldername.."//arsenalweaponconfig"
-
-if not isfolder(foldername) then
-    makefolder(foldername)
-    makefolder(fileconfig)
-end 
-
 game:GetService("RunService").RenderStepped:Connect(function()
     if LocalPlayer and LocalPlayer.Character and spin then
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
@@ -154,10 +144,6 @@ local LocalWSkin = LocalPlayer.Equipped
 
 local skinselector = SkinChangeTab:NewSelector("Change Knife Skin", "Select Skin", {}, function(d)
     LocalMelee.Value = d
-    if not isfile(skinfileconfig) then 
-        makefolder(skinfileconfig)
-    end 
-    writefile(skinfileconfig.."//melleeskin.txt", d)
 end)
 for i,v in AllMelees:GetChildren() do
     skinselector:AddOption(v.Name)
@@ -165,19 +151,10 @@ end
 
 local wskinselector = SkinChangeTab:NewSelector("Change Weapon Skin", "Select Skin", {}, function(d)
     LocalWSkin.Value = d
-    if not isfile(weaponfileconfig) then 
-        makefolder(weaponfileconfig)
-    end 
-    writefile(weaponfileconfig.."//weaponskin.txt", d)
 end)
 for i,v in AllWSkins:GetChildren() do
     wskinselector:AddOption(v.Name)
 end
-if #readfile(skinfileconfig.."//melleeskin.txt") > 1 and #readfile(weaponfileconfig.."//weaponskin.txt") > 1 then
-    LocalMelee.Value = readfile(skinfileconfig.."//melleeskin.txt")
-    LocalWSkin.Value = readfile(weaponfileconfig.."//weaponskin.txt")
-end
-
 
 local MovementSettings = {
     UseSpeedHacks = false,
