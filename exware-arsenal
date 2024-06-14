@@ -16,6 +16,67 @@ local followBlock
 local spin
 local spinspeed = 30
 
+local function HighlightPlayer(player)
+    -- Check if the player is not on the same team as the local player
+    if player.Team ~= LocalPlayer.Team then
+        -- Create a new highlight for the player
+        local highlight = Instance.new("Highlight", LocalPlayer.PlayerGui)
+        highlight.Adornee = player.Character
+        highlight.FillColor = Color3.new(1, 1, 1) -- White color
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    end
+end
+
+local function RemoveAllHighlights()
+    for _, descendant in ipairs(LocalPlayer.PlayerGui:GetDescendants()) do
+        if descendant:IsA("Highlight") then
+            descendant:Destroy()
+        end
+    end
+end
+
+local function ToggleHighlightESP(value)
+    RemoveAllHighlights()
+    
+    if value then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                HighlightPlayer(player)
+            end
+        end
+        
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Wait()
+            HighlightPlayer(player)
+        end)
+        
+
+        Players.PlayerRemoving:Connect(function(player)
+            RemoveAllHighlights()
+            if value then
+                for _, remainingPlayer in ipairs(Players:GetPlayers()) do
+                    if remainingPlayer ~= LocalPlayer then
+                        HighlightPlayer(remainingPlayer)
+                    end
+                end
+            end
+        end)
+        
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            player:GetPropertyChangedSignal("Team"):Connect(function()
+                RemoveAllHighlights()
+                if value then
+                    for _, otherPlayer in ipairs(Players:GetPlayers()) do
+                        if otherPlayer ~= LocalPlayer then
+                            HighlightPlayer(otherPlayer)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end
 -- Function to create a new part
 local function createFollowBlock()
     local followBlock = Instance.new("Part")
@@ -439,6 +500,10 @@ VisTab:NewToggle("Show Distance", false, function(bool)
     toggleESP()
 end)
 
+VisTab:NewToggle("Chams ESP", false, function(bool)
+    ToggleHighlightESP(bool)
+end)
+
 local ModSec = VisTab:NewSection("Mods")
 
 VisTab:NewSlider("Camera FOV", "", true, "/", {min = 30, max = 180, default = 60}, function(value)
@@ -509,7 +574,7 @@ for i,v in pairs(Players:GetChildren()) do
 
     function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            workspace.Camera.FieldOfView = ESPSettings.FOV
+            game.Players.LocalPlayer.Settings.FOV.Value = ESPSettings.FOV
             if ESPSettings.EspOn and v.Character ~= nil and v.Team ~= LocalPlayer.Team or not CombatSettings.TeamCheck and v ~= LocalPlayer and v.Character:FindFirstChild("HumanoidRootPart") then
                 local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character:FindFirstChild("Head").Position)
                 local RootPart = v.Character:FindFirstChild("HumanoidRootPart")
@@ -779,9 +844,33 @@ game:GetService("RunService").RenderStepped:Connect(function()
             v.Character.HumanoidRootPart.Size = Vector3.new(3,3,3)
         end
     end
+    for i,v in Players:GetPlayers() do
+        if v.Team == LocalPlayer.Team then
+            for i, G in LocalPlayer.PlayerGui:GetChildren() do
+                if G:IsA("Highlight") and G.Adornee == v.Character then
+                    G:Destroy()
+                end
+            end
+        end
+    end
+    local domouserelease = false
     if CombatSettings.Triggerbot == true then
         if checkNoWallsBetween(LocalPlayer, GetClosestPlayer(CombatSettings.TriggerSize)) then
             mouse1click()
+            domouserelease = true
+        else
+            if domouserelease == true then
+                domouserelease = false
+                mouse1release()
+                wait(0.1)
+                mouse1release()
+                wait(0.1)
+                mouse1release()
+                wait(0.1)
+                mouse1release()
+                wait(0.05)
+                mouse1release()
+            end
         end
     end
     if MovementSettings.BunnyHop and LocalPlayer.Character.Humanoid.Jump == false then LocalPlayer.Character.Humanoid.Jump = true end
