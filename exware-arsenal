@@ -7,13 +7,20 @@ local ArmOffset = Vector3.new(1, 0, 0)
 
 local spinning = false
 
-
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local camera = game.Workspace.CurrentCamera
 local followBlock
 local spin = false
 local spinspeed = 30
+
+local foldername = "exware"
+local fileconfig = foldername.."//arsenalconfigs"
+
+if not isfolder(foldername) then
+    makefolder(foldername)
+    makefolder(fileconfig)
+end 
 
 game:GetService("RunService").RenderStepped:Connect(function()
     if LocalPlayer and LocalPlayer.Character and spin then
@@ -130,6 +137,10 @@ local MovementTab = Window:NewTab("Movement")
 local MoveSec = MovementTab:NewSection("Movement")
 local GunTab = Window:NewTab("Gun Mods")
 local GunSec = GunTab:NewSection("Gun Mods")
+local ConfigTab = Window:NewTab("Configs")
+local ConfigSec = ConfigTab:NewSection("Configs")
+
+
 
 local MovementSettings = {
     UseSpeedHacks = false,
@@ -140,14 +151,14 @@ local MovementSettings = {
 
 GunTab:NewLabel("plan to see more here...", "left")
 local useinfammo = false
-GunTab:NewToggle("Infinite Ammo", false, function(bool)
+local infammotog = GunTab:NewToggle("Infinite Ammo", false, function(bool)
     game:GetService('RunService').PreRender:Connect(function()
         print("ammo go brrrrrrrrr")
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount.Value = 999    
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
     end)
 end)
-GunTab:NewToggle("Infinite Range", false, function(bool)
+local infrangetog =GunTab:NewToggle("Infinite Range", false, function(bool)
     if bool then
         for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
             if v.Name == "Range" then
@@ -158,7 +169,7 @@ GunTab:NewToggle("Infinite Range", false, function(bool)
 end)
 
 
-GunTab:NewToggle("Explosive Ammo", false, function(bool)
+local exploammotog =GunTab:NewToggle("Explosive Ammo", false, function(bool)
     if bool then
         for i, v in pairs(game.ReplicatedStorage.Weapons:GetChildren()) do
             if v:FindFirstChild("Projectile")==nil then
@@ -170,7 +181,7 @@ GunTab:NewToggle("Explosive Ammo", false, function(bool)
     end
 end)
 
-GunTab:NewToggle("No Reload", false, function(bool)
+local noreloadtog =GunTab:NewToggle("No Reload", false, function(bool)
     if bool then
                 for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
                 if v.Name == "ReloadTime" then
@@ -180,7 +191,7 @@ GunTab:NewToggle("No Reload", false, function(bool)
     end
 end)
 
-GunTab:NewToggle("Sonic FireRate", false, function(bool)
+local fireratetog =GunTab:NewToggle("Sonic FireRate", false, function(bool)
     if bool then
                 for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
                 if v.Name == "FireRate" then
@@ -191,7 +202,7 @@ GunTab:NewToggle("Sonic FireRate", false, function(bool)
     end
 end)
 
-GunTab:NewToggle("No Recoil", false, function(bool)
+local norecoiltog =GunTab:NewToggle("No Recoil", false, function(bool)
     if bool then
                 for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
                  if v.Name == "RecoilControl" then
@@ -201,7 +212,7 @@ GunTab:NewToggle("No Recoil", false, function(bool)
     end
 end)
 
-GunTab:NewToggle("No Spread", false, function(bool)
+local nospreadtog =GunTab:NewToggle("No Spread", false, function(bool)
             for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
         if v.Name == "MaxSpread" then
                        v.Value = 0
@@ -212,14 +223,14 @@ end)
 MovementTab:NewToggle("Enable Infinite Jump", false, function(bool)
     MovementSettings.InfiniteJump = bool
 end)
-MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
+local speedtog =MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
     MovementSettings.UseSpeedHacks = bool
 end)
 
-MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, function(value)
+local speedsl = MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, function(value)
     MovementSettings.Speed = value
 end)
-MovementTab:NewToggle("Enable Spinbot", false, function(bool)
+local spintog =MovementTab:NewToggle("Enable Spinbot", false, function(bool)
     spin = bool
 end)
 MovementTab:NewSlider("Spin Speed", "", true, "/", {min = 5, max = 50, default = 5}, function(value)
@@ -258,7 +269,7 @@ TriggerCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2,
 AimbotCircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 local ast =  Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y / 2)
 
-CombatTab:NewToggle("Enable Aimbot", false, function(bool)
+local aimbottog =CombatTab:NewToggle("Enable Aimbot", false, function(bool)
     CombatSettings.Aimbot = bool
     if usecircle == true then
         AimbotCircle.Visible = bool
@@ -309,7 +320,7 @@ local function checkNoWallsBetween(player1, player2)
     return false
 end
 
-CombatTab:NewToggle("Enable Triggerbot", false, function(bool)
+local triggertog =CombatTab:NewToggle("Enable Triggerbot", false, function(bool)
     CombatSettings.Triggerbot = bool
     TriggerCircle.Visible = bool
 end)
@@ -330,7 +341,7 @@ end)
 
 
 local BalantSec = CombatTab:NewSection("Balant")
-CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
+local hbtog = CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
     CombatSettings.ExpandHitboxes = bool
 end)
 local NetworkClient = cloneref(game:GetService("NetworkClient"))
@@ -465,28 +476,28 @@ for _, player in ipairs(game.Players:GetPlayers()) do
     updateESP(player)
 end
 
-VisTab:NewToggle("Box ESP", false, function(bool)
+local boxesptog =VisTab:NewToggle("Box ESP", false, function(bool)
     ESPSettings.EspOn = bool
 end)
 
-VisTab:NewToggle("Tracer ESP", false, function(bool)
+local traceresptog =VisTab:NewToggle("Tracer ESP", false, function(bool)
     ESPSettings.TracersOn = bool
 end)
-VisTab:NewToggle("Show Distance", false, function(bool)
+local distesptog =VisTab:NewToggle("Show Distance", false, function(bool)
     toggleESP()
 end)
 
-VisTab:NewToggle("Chams ESP", false, function(bool)
+local chamesptog =VisTab:NewToggle("Chams ESP", false, function(bool)
     ToggleHighlightESP(bool)
 end)
 
 local ModSec = VisTab:NewSection("Mods")
 
-VisTab:NewSlider("Camera FOV", "", true, "/", {min = 30, max = 180, default = 60}, function(value)
+local fovslider =VisTab:NewSlider("Camera FOV", "", true, "/", {min = 30, max = 180, default = 60}, function(value)
     ESPSettings.FOV = value
 end)
 
-VisTab:NewToggle("Rainbow Gun", false, function(bool)
+local rainbowguntog =VisTab:NewToggle("Rainbow Gun", false, function(bool)
     ESPSettings.RainbowGun = bool
 end)
 
@@ -879,3 +890,83 @@ game:GetService("UserInputService").JumpRequest:Connect(function()
         game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
+local cname = ""
+local filenametb = ConfigTab:NewTextbox("Config Name", "", "2", "all", "medium", true, false, function(val)
+cname = val
+end)
+local saveconfigbutton = ConfigTab:NewButton("Save Config (WIP)", function()
+    local filecon = [[
+               infammotog:Set(true)
+        infrangetog:Set(true)
+        exploammotog:Set(true)
+        noreloadtog:Set(true)
+        fireratetog:Set(true)
+        norecoiltog:Set(true)
+        nospreadtog:Set(true)
+        speedtog:Set(true)
+        spintog:Set(true)
+        aimbottog:Set(true)
+        triggertog:Set(true)
+        hbtog:Set(true)
+        boxesptog:Set(true)
+        traceresptog:Set(true)
+        distesptog:Set(true)
+        chamesptog:Set(true)
+        fovslider:Value(150)
+        rainbowguntog:Set(true)
+    ]]
+    writefile(fileconfig.."//"..cname, filecon)
+end)
+
+local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Balant", "Legit", "Semi-Balant"}, function(d)
+    if d == "Balant/HVH" then
+        infammotog:Set(true)
+        infrangetog:Set(true)
+        exploammotog:Set(true)
+        noreloadtog:Set(true)
+        fireratetog:Set(true)
+        norecoiltog:Set(true)
+        nospreadtog:Set(true)
+        speedtog:Set(true)
+        spintog:Set(true)
+        aimbottog:Set(true)
+        triggertog:Set(true)
+        hbtog:Set(true)
+        boxesptog:Set(true)
+        traceresptog:Set(true)
+        distesptog:Set(true)
+        chamesptog:Set(true)
+        fovslider:Value(150)
+        ESPSettings.FOV = 150
+        speedsl:Value(5)
+        MovementSettings.Speed = 5
+        rainbowguntog:Set(true)
+    end
+    if d == "Legit" then
+        boxesptog:Set(true)
+        traceresptog:Set(true)
+        distesptog:Set(true)
+        chamesptog:Set(true)
+        aimbottog:Set(true)
+    end
+    if d == "Semi-Balant" then
+        boxesptog:Set(true)
+        traceresptog:Set(true)
+        distesptog:Set(true)
+        chamesptog:Set(true)
+        aimbottog:Set(true)
+        hbtog:Set(true)
+        triggertog:Set(true)
+    end
+    if d ~= "Semi-Balant" and d ~= "Legit" and d~= "Balant/HVH" then
+        loadstring(readfile(foldername..d))
+    end
+end)
+local stepped = 0
+local reach = #listfiles(fileconfig)
+while stepped < reach do
+    stepped = stepped + 1
+    local filetable = listfiles(fileconfig)[stepped]:split("//")
+    cselect:AddOption(filetable[2])
+    wait(0.1)
+end
