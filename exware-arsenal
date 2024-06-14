@@ -919,7 +919,7 @@ local saveconfigbutton = ConfigTab:NewButton("Save Config (WIP)", function()
 end)
 
 local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Balant", "Legit", "Semi-Balant"}, function(d)
-    if d == "Balant/HVH" then
+    if d == "Balant" then
         infammotog:Set(true)
         infrangetog:Set(true)
         exploammotog:Set(true)
