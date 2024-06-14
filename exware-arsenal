@@ -13,8 +13,21 @@ local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local camera = game.Workspace.CurrentCamera
 local followBlock
-local spin
+local spin = false
 local spinspeed = 30
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    if LocalPlayer and LocalPlayer.Character and spin then
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            if spin then
+                LocalPlayer.Character.Humanoid.AutoRotate = false
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(spinspeed), 0)
+            else
+                LocalPlayer.Character.Humanoid.AutoRotate = true
+            end
+        end
+    end
+end)
 
 local function HighlightPlayer(player)
     -- Check if the player is not on the same team as the local player
@@ -89,43 +102,7 @@ local function createFollowBlock()
     return followBlock
 end
 
--- Function to update the block's position
-local function updateBlockPosition()
-    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    local newPosition = humanoidRootPart.Position + Vector3.new(-2, 4, 0)
-    followBlock.CFrame = CFrame.new(newPosition)
-    camera.CameraSubject = followBlock
-end
 
-
-local function toggleSpinningAndFollowing()
-    spinning = not spinning
-
-    if spinning then
-        spin = Instance.new("BodyAngularVelocity")
-        spin.Name = "Spinning"
-        spin.Parent = character:WaitForChild("HumanoidRootPart")
-        spin.MaxTorque = Vector3.new(0, math.huge, 0)
-        spin.AngularVelocity = Vector3.new(0, spinspeed, 0)
-
-
-        followBlock = createFollowBlock()
-
-        game:GetService("RunService").RenderStepped:Connect(updateBlockPosition)
-    else
-        if spin then
-            spin:Destroy()
-            spin = nil
-        end
-
-        if followBlock then
-            followBlock:Destroy()
-            followBlock = nil
-        end
-
-        camera.CameraSubject = character:WaitForChild("Humanoid")
-    end
-end
 
 local ESPSettings = {
     EspOn = false,
@@ -244,7 +221,7 @@ MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, 
     MovementSettings.Speed = value
 end)
 MovementTab:NewToggle("Enable Spinbot", false, function(bool)
-    toggleSpinningAndFollowing()
+    spin = bool
 end)
 MovementTab:NewSlider("Spin Speed", "", true, "/", {min = 5, max = 50, default = 5}, function(value)
     spinspeed = value
@@ -584,11 +561,11 @@ for i,v in pairs(Players:GetChildren()) do
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
@@ -689,11 +666,11 @@ Players.PlayerAdded:Connect(function(v)
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
@@ -827,6 +804,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
         end
     else
         for i,v in Players:GetPlayers() do
+            if v ~= LocalPlayer then
             v.Character.RightUpperLeg.CanCollide = false
             v.Character.RightUpperLeg.Transparency = 10
             v.Character.RightUpperLeg.Size = Vector3.new(3,3,3)
@@ -842,6 +820,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             v.Character.HumanoidRootPart.CanCollide = false
             v.Character.HumanoidRootPart.Transparency = 10
             v.Character.HumanoidRootPart.Size = Vector3.new(3,3,3)
+            end
         end
     end
     for i,v in Players:GetPlayers() do
