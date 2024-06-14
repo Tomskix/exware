@@ -139,7 +139,30 @@ local GunTab = Window:NewTab("Gun Mods")
 local GunSec = GunTab:NewSection("Gun Mods")
 local ConfigTab = Window:NewTab("Configs")
 local ConfigSec = ConfigTab:NewSection("Configs")
+local SkinChangeTab = Window:NewTab("Skin Changer")
+local SkinChangeSec = SkinChangeTab:NewSection("Skin Changer")
 
+local LocalMelee = LocalPlayer.Data.Melee
+
+local LocalChar = LocalPlayer.Data.Skin
+local AllChars = game:GetService("ReplicatedStorage").ItemData.Images.Skins
+local AllMelees = game:GetService("ReplicatedStorage").ItemData.Images.Melees 
+local AllWSkins = game:GetService("ReplicatedStorage").Skins
+local LocalWSkin = LocalPlayer.Equipped
+
+local skinselector = SkinChangeTab:NewSelector("Change Knife Skin", "Select Skin", {}, function(d)
+    LocalMelee.Value = d
+end)
+for i,v in AllMelees:GetChildren() do
+    skinselector:AddOption(v.Name)
+end
+
+local wskinselector = SkinChangeTab:NewSelector("Change Weapon Skin", "Select Skin", {}, function(d)
+    LocalWSkin.Value = d
+end)
+for i,v in AllWSkins:GetChildren() do
+    wskinselector:AddOption(v.Name)
+end
 
 
 local MovementSettings = {
