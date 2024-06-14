@@ -902,7 +902,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
             end
         end
     end
-    if MovementSettings.BunnyHop and LocalPlayer.Character.Humanoid.Jump == false then LocalPlayer.Character.Humanoid.Jump = true end
+    if MovementSettings.BunnyHop and LocalPlayer.Character.Humanoid then 
+        if LocalPlayer.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running then 
+            LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
 end)
 
 
