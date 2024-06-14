@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Camera = game:GetService("Workspace").CurrentCamera
 local HeadOffset = Vector3.new(0, 0.5, 0)
-local LegOffset = Vector3.new(0, 4, 0)
+local LegOffset = Vector3.new(0, 3, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
 
 
@@ -561,11 +561,11 @@ for i,v in pairs(Players:GetChildren()) do
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
@@ -666,11 +666,11 @@ Players.PlayerAdded:Connect(function(v)
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
