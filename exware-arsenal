@@ -5,7 +5,6 @@ local HeadOffset = Vector3.new(0, 0.5, 0)
 local LegOffset = Vector3.new(0, 3, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
 
-
 local spinning = false
 
 
@@ -561,20 +560,20 @@ for i,v in pairs(Players:GetChildren()) do
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new((HeadPosition.Y - LegPosition.Y) / 2, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new((HeadPosition.Y - LegPosition.Y) / 2, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
                     HealthBarOutline.Size = Vector2.new(0, HeadPosition.Y - LegPosition.Y)
-                    HealthBarOutline.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBarOutline.Position = Vector2.new(Box.Position.X , Box.Position.Y + (1/HealthBar.Size.Y))
                     HealthBarOutline.Visible = true
                     print("No HEre!")
                     HealthBar.Size = Vector2.new(0, (HeadPosition.Y - LegPosition.Y) / (100 / math.clamp(100, 0, v:WaitForChild("NRPBS").Health.Value)))
-                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBar.Position = Vector2.new(Box.Position.X , Box.Position.Y + (1/HealthBar.Size.Y))
                     HealthBar.Visible = true
                 else
                     BoxOutline.Visible = false
@@ -656,7 +655,7 @@ Players.PlayerAdded:Connect(function(v)
 
     function boxesp()
         game:GetService("RunService").RenderStepped:Connect(function()
-            workspace.Camera.FieldOfView = ESPSettings.FOV
+            game.Players.LocalPlayer.Settings.FOV.Value = ESPSettings.FOV
             if ESPSettings.EspOn and v.Character ~= nil and v.Team ~= LocalPlayer.Team or not CombatSettings.TeamCheck and v ~= LocalPlayer and v.Character:FindFirstChild("HumanoidRootPart") then
                 local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character:FindFirstChild("Head").Position)
                 local RootPart = v.Character:FindFirstChild("HumanoidRootPart")
@@ -666,20 +665,20 @@ Players.PlayerAdded:Connect(function(v)
                 local HeadPosition, HeadVis = Camera:WorldToViewportPoint(Head.Position + HeadOffset)
                 local LegPosition = Camera:WorldToViewportPoint(RootPart.Position - LegOffset)
                 if OnScreen == true then
-                    BoxOutline.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Size = Vector2.new((HeadPosition.Y - LegPosition.Y) / 2, HeadPosition.Y - LegPosition.Y)
                     BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
                     BoxOutline.Visible = true
 
-                    Box.Size = Vector2.new(2500 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Size = Vector2.new((HeadPosition.Y - LegPosition.Y) / 2, HeadPosition.Y - LegPosition.Y)
                     Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
                     Box.Visible = true
                     print("Here")
                     HealthBarOutline.Size = Vector2.new(0, HeadPosition.Y - LegPosition.Y)
-                    HealthBarOutline.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBarOutline.Position = Vector2.new(Box.Position.X , Box.Position.Y + (1/HealthBar.Size.Y))
                     HealthBarOutline.Visible = true
                     print("No HEre!")
                     HealthBar.Size = Vector2.new(0, (HeadPosition.Y - LegPosition.Y) / (100 / math.clamp(100, 0, v:WaitForChild("NRPBS").Health.Value)))
-                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+                    HealthBar.Position = Vector2.new(Box.Position.X , Box.Position.Y + (1/HealthBar.Size.Y))
                     HealthBar.Visible = true
                 else
                     BoxOutline.Visible = false
@@ -692,9 +691,12 @@ Players.PlayerAdded:Connect(function(v)
                 Box.Visible = false
                 HealthBar.Visible = false
                 HealthBarOutline.Visible = false
+                TracerLine.Visible = false
             end
         end)
-        end
+
+    end
+
     function LineESP()
     repeat
         task.wait()
