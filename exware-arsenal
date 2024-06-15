@@ -38,6 +38,7 @@ local function HighlightPlayer(player)
     end
 end
 
+
 local function RemoveAllHighlights()
     for _, descendant in ipairs(LocalPlayer.PlayerGui:GetDescendants()) do
         if descendant:IsA("Highlight") then
@@ -208,7 +209,7 @@ end)
 local fireratetog =GunTab:NewToggle("Sonic FireRate", false, function(bool)
     if bool then
                 for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
-                if v.Name == "FireRate" then
+                if v.Name == "FireRate" or v.Name == "EquipTime" or v.Name == "Equiptime" or v.Name == "equiptime" then
                        v.Value = 0.05
                 end
                 if v.Name == "Auto" then v.Value = true end
@@ -514,6 +515,7 @@ end)
 local rainbowguntog =VisTab:NewToggle("Rainbow Gun", false, function(bool)
     ESPSettings.RainbowGun = bool
 end)
+
 
 function GetClosestPlayer(FOV)
     local plr
@@ -987,4 +989,4 @@ while stepped < reach do
     local filetable = listfiles(fileconfig)[stepped]:split("//")
     cselect:AddOption(filetable[2])
     wait(0.1)
-end
+end 
