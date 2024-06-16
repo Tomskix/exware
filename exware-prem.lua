@@ -273,10 +273,12 @@ workspace.Live.DescendantAdded:Connect(function(dec)
 end)
 
  game.Players.DescendantAdded:Connect(function(dec)
-    if dec:IsA("Tool") and dec.Name == "Death Counter" or dec.Name == "The Final Hunt" or dec.Name == "Death Blow" or dec.Name == "Straight On" or dec.Name == "Sunset" or dec.Name == "Terrible Tornado" or dec.Name == "Incinerate" and VisualSettings.ShowUlt then
-        local uh = Instance.new("Highlight", dec.Parent.Parent.Character)
-        uh.Name = "Hult"
-        uh.FillColor = Color3.fromRGB(255,255,0)
+    if dec:IsA("Tool") and dec.Name == "Death Counter" or dec.Name == "The Final Hunt" or dec.Name == "Death Blow" or dec.Name == "Straight On" or dec.Name == "Sunset" or dec.Name == "Terrible Tornado" or dec.Name == "Incinerate" and VisualSettings.ShowUlt  == true then
+        if VisualSettings.ShowUlt == true then
+            local uh = Instance.new("Highlight", dec.Parent.Parent.Character)
+            uh.Name = "Hult"
+            uh.FillColor = Color3.fromRGB(255,255,0)
+        end
     end
 end)
 
