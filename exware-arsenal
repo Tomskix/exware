@@ -386,10 +386,8 @@ local killallbutton = CombatTab:NewButton("Kill All", function()
                 repeat
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
                     workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
-                    mouse1press()
                     wait()
                 until v:WaitForChild("NRPBS").Health.Value < 15
-                mouse1release()
             end
         end
     end
@@ -990,6 +988,7 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         aimbottog:Set(true)
         triggertog:Set(true)
         hbtog:Set(true)
+        traceresptog:Set(true)
         boxesptog:Set(true)
         traceresptog:Set(true)
         distesptog:Set(true)
