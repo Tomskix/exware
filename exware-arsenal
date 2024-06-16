@@ -335,15 +335,8 @@ local function checkNoWallsBetween(player1, player2)
     return false
 end
 
-local triggertog =CombatTab:NewToggle("Enable Triggerbot", false, function(bool)
-    CombatSettings.Triggerbot = bool
-    TriggerCircle.Visible = bool
-end)
 
-CombatTab:NewSlider("Triggerbot Size", "", true, "/", {min = 5, max = 90, default = 30}, function(value)
-    TriggerCircle.Radius = value
-    CombatSettings.TriggerSize = value
-end)
+
 
 CombatTab:NewSelector("HitPart", "Adjust your Hitpart", {"Head", "HumanoidRootPart"}, function(d)
     CombatSettings.HitPart = d
@@ -353,11 +346,35 @@ CombatTab:NewSlider("Aimbot FOV", "", true, "/", {min = 30, max = 360, default =
     AimbotCircle.Radius = value
     AimbotCache.Aimbotsize = value
 end)
+local AimbotSec = CombatTab:NewSection("Triggerbot")
 
+local triggertog =CombatTab:NewToggle("Enable Triggerbot", false, function(bool)
+    CombatSettings.Triggerbot = bool
+    TriggerCircle.Visible = bool
+end)
+CombatTab:NewSlider("Triggerbot Size", "", true, "/", {min = 5, max = 90, default = 30}, function(value)
+    TriggerCircle.Radius = value
+    CombatSettings.TriggerSize = value
+end)
 
-local BalantSec = CombatTab:NewSection("Balant")
+local BalantSec = CombatTab:NewSection("Blatant")
 local hbtog = CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
     CombatSettings.ExpandHitboxes = bool
+end)
+local killallbutton = CombatTab:NewButton("Kill All", function()
+    while game.ReplicatedStorage.wkspc.MatchTime.Value > 5 do
+        for i,v in Players:GetPlayers() do
+            if v.Team ~= LocalPlayer.Team then
+                repeat
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
+                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
+                    mouse1press()
+                    wait()
+                until v:WaitForChild("NRPBS").Health.Value < 15
+                mouse1release()
+            end
+        end
+    end
 end)
 local NetworkClient = cloneref(game:GetService("NetworkClient"))
 CombatTab:NewToggle("Lagswitch", false, function(bool)
