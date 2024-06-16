@@ -152,32 +152,6 @@ local ShowDCToggle = VisualTab:NewToggle("Show DeathCounter", false, function(va
 end)
 local DColor = VisualTab:NewSelector("Death Counter Highlight Color", "Select Color", {"Red", "Orange", "Yellow", "Green", "Blue", "Purple"}, function(d)
     if d == "Red" then
-        VisualSettings.UltColor = Color3.fromRGB(255,0,0)
-    end
-    if d == "Orange" then
-        VisualSettings.UltColor = Color3.fromRGB(255,137,0)
-    end
-    if d == "Yellow" then
-        VisualSettings.UltColor = Color3.fromRGB(255,255,0)
-    end 
-    if d == "Green" then
-        VisualSettings.UltColor = Color3.fromRGB(0,255,0)
-    end 
-    if d == "Blue" then
-        VisualSettings.UltColor = Color3.fromRGB(0,0,255)
-    end
-    if d == "Purple" then
-        VisualSettings.UltColor = Color3.fromGB(205, 0, 255)
-    end
-end)
-
-
-local ShowDCToggle = VisualTab:NewToggle("Show Ultimates", false, function(value)
-    VisualSettings.ShowUlt = value
-end)
-
-local UColor = VisualTab:NewSelector("Ultimate Highlight Color", "Select Color", {"Red", "Orange", "Yellow", "Green", "Blue", "Purple"}, function(d)
-    if d == "Red" then
         VisualSettings.DCColor = Color3.fromRGB(255,0,0)
     end
     if d == "Orange" then
@@ -194,6 +168,32 @@ local UColor = VisualTab:NewSelector("Ultimate Highlight Color", "Select Color",
     end
     if d == "Purple" then
         VisualSettings.DCColor = Color3.fromGB(205, 0, 255)
+    end
+end)
+
+
+local ShowDCToggle = VisualTab:NewToggle("Show Ultimates", false, function(value)
+    VisualSettings.ShowUlt = value
+end)
+
+local UColor = VisualTab:NewSelector("Ultimate Highlight Color", "Select Color", {"Red", "Orange", "Yellow", "Green", "Blue", "Purple"}, function(d)
+    if d == "Red" then
+        VisualSettings.UltColor = Color3.fromRGB(255,0,0)
+    end
+    if d == "Orange" then
+        VisualSettings.UltColor = Color3.fromRGB(255,137,0)
+    end
+    if d == "Yellow" then
+        VisualSettings.UltColor = Color3.fromRGB(255,255,0)
+    end 
+    if d == "Green" then
+        VisualSettings.UltColor = Color3.fromRGB(0,255,0)
+    end 
+    if d == "Blue" then
+        VisualSettings.UltColor = Color3.fromRGB(0,0,255)
+    end
+    if d == "Purple" then
+        VisualSettings.UltColor = Color3.fromGB(205, 0, 255)
     end
 end)
 
