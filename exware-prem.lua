@@ -19,7 +19,7 @@ local VisualTab = Init:NewTab("Visuals")
 local TrollTab = Init:NewTab("Trolling")
 local CombatSection = CombatTab:NewSection("PVP")
 local VisualSection = VisualTab:NewSection("Visuals")
-local TrollSection = VisualTab:NewSection("Trolling")
+local TrollSection = TrollTab:NewSection("Trolling")
 
 CombatSettings = {
     TargetWS = 3,
