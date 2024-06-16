@@ -955,8 +955,8 @@ local saveconfigbutton = ConfigTab:NewButton("Save Config (WIP)", function()
     writefile(fileconfig.."//"..cname, filecon)
 end)
 
-local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Balant", "Legit", "Semi-Balant"}, function(d)
-    if d == "Balant" then
+local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Blatant", "Legit", "Semi-Blatant"}, function(d)
+    if d == "Blatant" then
         infammotog:Set(true)
         infrangetog:Set(true)
         exploammotog:Set(true)
@@ -986,7 +986,7 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         chamesptog:Set(true)
         aimbottog:Set(true)
     end
-    if d == "Semi-Balant" then
+    if d == "Semi-Blatant" then
         boxesptog:Set(true)
         traceresptog:Set(true)
         distesptog:Set(true)
@@ -995,7 +995,7 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         hbtog:Set(true)
         triggertog:Set(true)
     end
-    if d ~= "Semi-Balant" and d ~= "Legit" and d~= "Balant/HVH" then
+    if d ~= "Semi-Blatant" and d ~= "Legit" and d~= "Blatant" then
         loadstring(readfile(foldername..d))
     end
 end)
