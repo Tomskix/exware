@@ -5,15 +5,13 @@ local HeadOffset = Vector3.new(0, 0.5, 0)
 local LegOffset = Vector3.new(0, 4, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
 
-if not isfile("exwareconfigs.txt") then
-    local data = [[
-        local arsenal = {
-            
-        }
-    ]]
-    writefile("exwareconfigs.txt", data)
+function Wallbang(person)
+    local personhb = person.Character.Head.Size
+    local Dist = (game.Players.LocalPlayer.Character.Head.Position - person.Character.Head.Position)
+    person.Character.Head.Size = person.Character.Head.Size + Dist 
+    wait(0.5)
+    person.Character.Head.Size = personhb
 end
-
 local spinning = false
 
 local player = game.Players.LocalPlayer
@@ -186,7 +184,7 @@ local infammotog = GunTab:NewToggle("Infinite Ammo", false, function(bool)
 end)
 local noselfdmgt = GunTab:NewToggle("Disable Self Damage", false, function(bool)
     for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
-        if v.SelfDamage then v.SelfDamage = 0 end
+        if v:FindFirstChild("SelfDamage") then v.SelfDamage = 0 end
     end
 end)
 local tracerstog = GunTab:NewToggle("Bullet Tracers", false ,function(bool)
