@@ -182,11 +182,7 @@ local infammotog = GunTab:NewToggle("Infinite Ammo", false, function(bool)
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
     end)
 end)
-local noselfdmgt = GunTab:NewToggle("Disable Self Damage", false, function(bool)
-    for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
-        if v:FindFirstChild("SelfDamage") then v.SelfDamage = 0 end
-    end
-end)
+
 local tracerstog = GunTab:NewToggle("Bullet Tracers", false ,function(bool)
     for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
         local f = Instance.new("Folder", v)
@@ -990,8 +986,6 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         noreloadtog:Set(true)
         fireratetog:Set(true)
         norecoiltog:Set(true)
-        nospreadtog:Set(true)
-        noselfdmgt:Set(true)
         tracerstog:Set(true)
         speedtog:Set(true)
         spintog:Set(true)
