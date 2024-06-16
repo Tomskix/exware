@@ -32,6 +32,7 @@ CombatSettings = {
     Crushing = false,
     Lethal = false,
     Flowing = false,
+    SpeedMethod = "CFrame"
 }
 
 VisualSettings = {
@@ -79,6 +80,10 @@ end)
 
 local WalkSpeedSlider = CombatTab:NewSlider("JumpPower", "", true, "/", {min = 50, max = 500, default = 500}, function(value)
     CombatSettings.TargetJP = value
+end)
+
+local MovementSelector = CombatTab:NewSelector("Select Speed Method", "Select Speed", {"CFrame", "Velocity", "WalkSpeed"}, function(d)
+    CombatSettings.SpeedMethod = d
 end)
 
 
@@ -201,6 +206,10 @@ game.Players.LocalPlayer.Character.DescendantAdded:Connect(function(dec)
     end
 end)
 
+local bv = Instance.new("BodyVelocity", workspace)
+bv.MaxForce = Vector3.new(10000000,0,10000000)
+bv.Velocity = Vector3.new(0,0,0)
+
 game:GetService("RunService").RenderStepped:Connect(function()
     for i,v in workspace.Live:GetDescendants() do
         if v:IsA("Highlight") and v.Parent:FindFirstChild("Humanoid") and v.Parent.Name ~= game.Players.LocalPlayer.Name and v.Name == "hdc" then
@@ -215,12 +224,21 @@ game:GetService("RunService").RenderStepped:Connect(function()
         hum.JumpPower = CombatSettings.TargetJP
         hb = game:GetService("RunService").Heartbeat
         local delta = hb:wait()
-        if hum.MoveDirection.Magnitude > 0 and CombatSettings.EnableWalkSpeed then
+        if hum.MoveDirection.Magnitude > 0 and CombatSettings.EnableWalkSpeed and CombatSettings.SpeedMethod == "CFrame" then
             chr:TranslateBy(hum.MoveDirection * CombatSettings.TargetWS * delta * 10)
         else
-            if CombatSettings.EnableWalkSpeed then
+            if CombatSettings.EnableWalkSpeed and CombatSettings.SpeedMethod == "CFrame" then
                 chr:TranslateBy(hum.MoveDirection * delta * 10)
             end
+        end
+        if CombatSettings.EnableWalkSpeed and CombatSettings.SpeedMethod == "WalkSpeed" then
+            hum.WalkSpeed = CombatSettings.TargetWS * 3
+        end
+        if CombatSettings.EnableWalkSpeed and CombatSettings.SpeedMethod == "Velocity" then
+            bv.Parent = chr.HumanoidRootPart
+            bv.Velocity = chr.Humanoid.MoveDirection * (CombatSettings.TargetWS * 10)
+        else
+            bv.Parent = workspace
         end
 
     if CombatSettings.Noclip then
