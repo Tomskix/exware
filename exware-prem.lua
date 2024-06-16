@@ -8,7 +8,7 @@ local Notif = library:InitNotifications()
 
 local LoadingXSX = Notif:Notify("Loading ExWare please wait!.", 2, "LAST UPDATE 06/16/2024") 
 
-library.title = "ExWare"
+library.title = "ExWare - The Strongest Battlegrounds"
 
 library:Introduction()
 wait(1)
