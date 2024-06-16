@@ -178,7 +178,6 @@ workspace.Live.DescendantAdded:Connect(function(dec)
         wait(2.5)
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = hr
     end
-    end
 end)
 
 
