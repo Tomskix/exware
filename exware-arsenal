@@ -5,6 +5,15 @@ local HeadOffset = Vector3.new(0, 0.5, 0)
 local LegOffset = Vector3.new(0, 4, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
 
+if not isfile("exwareconfigs.txt") then
+    local data = [[
+        local arsenal = {
+            
+        }
+    ]]
+    writefile("exwareconfigs.txt", data)
+end
+
 local spinning = false
 
 local player = game.Players.LocalPlayer
@@ -119,6 +128,7 @@ local AimbotCache = {
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Consistt/Ui/main/UnLeaked"))()
 library.title = "ExWare - Arsenal"
+local Wm = library:Watermark("exware | rank: Tester | version: 1.0.1")
 library:Introduction()
 local Window = library:Init()
 
@@ -162,6 +172,7 @@ local MovementSettings = {
     Speed = 1,
     InfiniteJump = false,
     BunnyHop = false,
+    MovementMethod = "CFrame"
 }
 
 GunTab:NewLabel("plan to see more here...", "left")
@@ -172,6 +183,11 @@ local infammotog = GunTab:NewToggle("Infinite Ammo", false, function(bool)
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount.Value = 999    
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
     end)
+end)
+local noselfdmgt = GunTab:NewToggle("Disable Self Damage", false, function(bool)
+    for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
+        if v.SelfDamage then v.SelfDamage = 0 end
+    end
 end)
 local tracerstog = GunTab:NewToggle("Bullet Tracers", false ,function(bool)
     for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
@@ -244,8 +260,12 @@ end)
 MovementTab:NewToggle("Enable Infinite Jump", false, function(bool)
     MovementSettings.InfiniteJump = bool
 end)
-local speedtog =MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
+local speedtog = MovementTab:NewToggle("Enable SpeedHacks", false, function(bool)
     MovementSettings.UseSpeedHacks = bool
+end)
+
+local SpeedMethod = MovementTab:NewSelector("Speed Method", "WalkSpeed Method", {"CFrame", "Velocity"}, function(d)
+    MovementSettings.MovementMethod = d
 end)
 
 local speedsl = MovementTab:NewSlider("Speed", "", true, "/", {min = 1, max = 50, default = 1}, function(value)
@@ -822,8 +842,15 @@ end)
 
 
 
-
+local sv = Instance.new("BodyVelocity", workspace)
+sv.MaxForce = Vector3.new(999999,0,9999999)
+sv.Velocity = Vector3.new(0,0,0)
+sv.Name = "sv"
 game:GetService("RunService").RenderStepped:Connect(function()
+    if MovementSettings.MovementMethod == "Velocity" and MovementSettings.UseSpeedHacks then
+        sv.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+        LocalPlayer.Character.HumanoidRootPart:FindFirstChild("sv").Velocity = game.Players.LocalPlayer.Character.Humanoid.MoveDirection * MovementSettings.Speed
+    end
     if LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
         LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity").Velocity = game.Players.LocalPlayer.Character.Humanoid.MoveDirection * bhopspeed
     end
@@ -840,10 +867,10 @@ game:GetService("RunService").RenderStepped:Connect(function()
     hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
     hb = game:GetService("RunService").Heartbeat
     local delta = hb:wait()
-    if hum.MoveDirection.Magnitude > 0 and MovementSettings.UseSpeedHacks then
+    if hum.MoveDirection.Magnitude > 0 and MovementSettings.UseSpeedHacks and MovementSettings.MovementMethod == "CFrame" then
         chr:TranslateBy(hum.MoveDirection * MovementSettings.Speed * delta * 10)
     else
-        if MovementSettings.UseSpeedHacks then
+        if MovementSettings.UseSpeedHacks and MovementSettings.MovementMethod == "CFrame" then
             chr:TranslateBy(hum.MoveDirection * delta * 10)
         end
     end
@@ -951,27 +978,10 @@ local filenametb = ConfigTab:NewTextbox("Config Name", "", "2", "all", "medium",
 cname = val
 end)
 local saveconfigbutton = ConfigTab:NewButton("Save Config (WIP)", function()
-    local filecon = [[
-               infammotog:Set(true)
-        infrangetog:Set(true)
-        exploammotog:Set(true)
-        noreloadtog:Set(true)
-        fireratetog:Set(true)
-        norecoiltog:Set(true)
-        nospreadtog:Set(true)
-        speedtog:Set(true)
-        spintog:Set(true)
-        aimbottog:Set(true)
-        triggertog:Set(true)
-        hbtog:Set(true)
-        boxesptog:Set(true)
-        traceresptog:Set(true)
-        distesptog:Set(true)
-        chamesptog:Set(true)
-        fovslider:Value(150)
-        rainbowguntog:Set(true)
-    ]]
-    writefile(fileconfig.."//"..cname, filecon)
+    local filecontent = {
+        
+    }
+    writefile("exwareconfigs.txt")
 end)
 
 local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Blatant", "Legit", "Semi-Blatant"}, function(d)
@@ -983,12 +993,13 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         fireratetog:Set(true)
         norecoiltog:Set(true)
         nospreadtog:Set(true)
+        noselfdmgt:Set(true)
+        tracerstog:Set(true)
         speedtog:Set(true)
         spintog:Set(true)
         aimbottog:Set(true)
         triggertog:Set(true)
         hbtog:Set(true)
-        traceresptog:Set(true)
         boxesptog:Set(true)
         traceresptog:Set(true)
         distesptog:Set(true)
