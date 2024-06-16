@@ -6,7 +6,7 @@ local Wm = library:Watermark("exware | v" .. library.version ..  " | " .. librar
 
 local Notif = library:InitNotifications()
 
-local LoadingXSX = Notif:Notify("Loading ExWare please wait!.", 2, "LAST UPDATE 06/06/2024") 
+local LoadingXSX = Notif:Notify("Loading ExWare please wait!.", 2, "LAST UPDATE 06/16/2024") 
 
 library.title = "ExWare"
 
@@ -16,8 +16,10 @@ local Init = library:Init()
 
 local CombatTab = Init:NewTab("Combat")
 local VisualTab = Init:NewTab("Visuals")
+local TrollTab = Init:NewTab("Trolling")
 local CombatSection = CombatTab:NewSection("PVP")
 local VisualSection = VisualTab:NewSection("Visuals")
+local TrollSection = VisualTab:NewSection("Trolling")
 
 CombatSettings = {
     TargetWS = 3,
@@ -26,13 +28,28 @@ CombatSettings = {
     TargetJP = 50,
     FlingEnabled = false,
     AutoBlock = false,
-    Noclip = false
+    Noclip = false,
+    Crushing = false,
+    Lethal = false,
+    Flowing = false,
 }
 
 VisualSettings = {
     HighlightDC = false,
     ShowUlt = false,
 }
+
+local CrushingKill = TrollTab:NewToggle("Serious Crushing Pull", false, function(value)
+    CombatSettings.Crushing = value
+end)
+
+local SeriousLethal = TrollTab:NewToggle("Serious Lethal Whirlwind", false, function(value)
+    CombatSettings.Lethal = value
+end)
+
+local SeriousFlow = TrollTab:NewToggle("Serious Flowing Water", false, function(value)
+    CombatSettings.Flowing = value
+end)
 
 local UseSpeedToggle = CombatTab:NewToggle("Use WalkSpeed", false, function(value)
     CombatSettings.EnableWalkSpeed = value
@@ -53,6 +70,9 @@ local AntiFlingToggle = CombatTab:NewToggle("Noclip/Antifling", false, function(
     CombatSettings.Noclip = value
 end)
 
+
+
+
 local WalkSpeedSlider = CombatTab:NewSlider("WalkSpeed", "", true, "/", {min = 1, max = 30, default = 3}, function(value)
     CombatSettings.TargetWS = value
 end)
@@ -60,6 +80,8 @@ end)
 local WalkSpeedSlider = CombatTab:NewSlider("JumpPower", "", true, "/", {min = 50, max = 500, default = 500}, function(value)
     CombatSettings.TargetJP = value
 end)
+
+
 
 
 
@@ -135,11 +157,32 @@ workspace.Live.DescendantAdded:Connect(function(dec)
         until dparent:FindFirstChild("Counter")==nil
         a:Destroy()
     end
+    if dec.Name == "Crushing Pull" and dec.Parent.Name == game.Players.LocalPlayer.Name and CombatSettings.Crushing then
+        local hr = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        wait(0.25)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(99999,9999,9999)
+        wait(1)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = hr
+    end
+    if dec.Name == "Lethal Whirlwind Stream" and dec.Parent.Name == game.Players.LocalPlayer.Name and CombatSettings.Lethal then
+        local hr = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        wait(0.55)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(99999,9999,9999)
+        wait(2.5)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = hr
+    end
+    if dec.Name == "Flowing Water" and dec.Parent.Name == game.Players.LocalPlayer.Name and CombatSettings.Flowing then
+        local hr = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        wait(0.55)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(99999,9999,9999)
+        wait(2.5)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = hr
+    end
+    end
 end)
 
 
 game.Players.LocalPlayer.Character.DescendantAdded:Connect(function(dec)
-    print(dec.ClassName)
 
     if dec.Name == "RagdollSim" and CombatSettings.IsStunEnabled == true then
         game.Players.LocalPlayer.Character:FindFirstChild("Torso").Anchored = true
@@ -201,7 +244,6 @@ workspace.Live.DescendantAdded:Connect(function(dec)
         local TargetCharacterPos = dec.Parent:FindFirstChild("HumanoidRootPart").Position
         local dparent = dec.Parent
         local dname = dec.Name
-        print(dec.Name)
         local lpos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position
         if (lpos - TargetCharacterPos).Magnitude < 17 then
             keypress(Enum.KeyCode.F)
