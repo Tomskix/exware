@@ -652,7 +652,7 @@ for i,v in pairs(Players:GetChildren()) do
                 else
                     TracerLine.Visible = false
                 end
-                if v.Team == LocalPlayer.Team then TracerLine.Visible = false end
+                if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == false then TracerLine.Visible = false end
             end)
         else
             TracerLine.Visible = false
@@ -771,7 +771,7 @@ Players.PlayerAdded:Connect(function(v)
                         TracerLine.Visible = false
                     end
 
-                    if v.Team == LocalPlayer.Team then
+                    if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == false then
                         TracerLine.Visible = false
                     end
                 else
