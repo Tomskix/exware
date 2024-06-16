@@ -173,6 +173,12 @@ local infammotog = GunTab:NewToggle("Infinite Ammo", false, function(bool)
         game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client.Variables.ammocount2.Value = 999
     end)
 end)
+local tracerstog = GunTab:NewToggle("Bullet Tracers", false ,function(bool)
+    for i,v in game.ReplicatedStorage.Weapons:GetChildren() do
+        local f = Instance.new("Folder", v)
+        f.Name = "Laser"
+    end
+end)
 local infrangetog =GunTab:NewToggle("Infinite Range", false, function(bool)
     if bool then
         for i, v in pairs(game.ReplicatedStorage.Weapons:GetDescendants()) do
@@ -254,6 +260,18 @@ end)
 
 MovementTab:NewToggle("BunnyHop", false, function(bool)
     MovementSettings.BunnyHop = bool
+    if bool == true then
+        local V = Instance.new("BodyVelocity")
+        V.Parent = LocalPlayer.Character.HumanoidRootPart
+        V.MaxForce = Vector3.new(100000,0,100000)
+        V.Velocity = Vector3.new(0,0,0)
+    else
+        LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity"):Destroy()
+    end
+end)
+bhopspeed = 5
+MovementTab:NewSlider("Bunny Hop Velocity", "", true, "/", {min = 5, max = 50, default = 5}, function(value)
+    bhopspeed = value
 end)
 
 local CombatSettings = {
@@ -652,7 +670,7 @@ for i,v in pairs(Players:GetChildren()) do
                 else
                     TracerLine.Visible = false
                 end
-                if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == false then TracerLine.Visible = false end
+                if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == true then TracerLine.Visible = false end
             end)
         else
             TracerLine.Visible = false
@@ -771,7 +789,7 @@ Players.PlayerAdded:Connect(function(v)
                         TracerLine.Visible = false
                     end
 
-                    if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == false then
+                    if v.Team == LocalPlayer.Team and CombatSettings.TeamCheck == true then
                         TracerLine.Visible = false
                     end
                 else
@@ -808,6 +826,9 @@ end)
 
 
 game:GetService("RunService").RenderStepped:Connect(function()
+    if LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then
+        LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity").Velocity = game.Players.LocalPlayer.Character.Humanoid.MoveDirection * bhopspeed
+    end
     if AimbotCache.MouseDown and CombatSettings.Aimbot  then
         if AimbotCache.target and AimbotCache.target:FindFirstChild("NRPBS").Health.Value > 0 then
             workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).Position)
