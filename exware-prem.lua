@@ -38,6 +38,8 @@ CombatSettings = {
 VisualSettings = {
     HighlightDC = false,
     ShowUlt = false,
+    DCColor = Color3.fromRGB(255,0,0),
+    UltColor = Color3.fromRGB(255,255,0),
 }
 
 local CrushingKill = TrollTab:NewToggle("Serious Crushing Pull", false, function(value)
@@ -148,8 +150,51 @@ end):AddKeybind(Enum.KeyCode.LeftShift)
 local ShowDCToggle = VisualTab:NewToggle("Show DeathCounter", false, function(value)
     VisualSettings.HighlightDC = value
 end)
+local DColor = VisualTab:NewSelector("Death Counter Highlight Color", "Select Color", {"Red", "Orange", "Yellow", "Green", "Blue", "Purple"}, function(d)
+    if d == "Red" then
+        VisualSettings.UltColor = Color3.fromRGB(255,0,0)
+    end
+    if d == "Orange" then
+        VisualSettings.UltColor = Color3.fromRGB(255,137,0)
+    end
+    if d == "Yellow" then
+        VisualSettings.UltColor = Color3.fromRGB(255,255,0)
+    end 
+    if d == "Green" then
+        VisualSettings.UltColor = Color3.fromRGB(0,255,0)
+    end 
+    if d == "Blue" then
+        VisualSettings.UltColor = Color3.fromRGB(0,0,255)
+    end
+    if d == "Purple" then
+        VisualSettings.UltColor = Color3.fromGB(205, 0, 255)
+    end
+end)
+
+
 local ShowDCToggle = VisualTab:NewToggle("Show Ultimates", false, function(value)
     VisualSettings.ShowUlt = value
+end)
+
+local UColor = VisualTab:NewSelector("Ultimate Highlight Color", "Select Color", {"Red", "Orange", "Yellow", "Green", "Blue", "Purple"}, function(d)
+    if d == "Red" then
+        VisualSettings.DCColor = Color3.fromRGB(255,0,0)
+    end
+    if d == "Orange" then
+        VisualSettings.DCColor = Color3.fromRGB(255,137,0)
+    end
+    if d == "Yellow" then
+        VisualSettings.DCColor = Color3.fromRGB(255,255,0)
+    end 
+    if d == "Green" then
+        VisualSettings.DCColor = Color3.fromRGB(0,255,0)
+    end 
+    if d == "Blue" then
+        VisualSettings.DCColor = Color3.fromRGB(0,0,255)
+    end
+    if d == "Purple" then
+        VisualSettings.DCColor = Color3.fromGB(205, 0, 255)
+    end
 end)
 
 workspace.Live.DescendantAdded:Connect(function(dec)
@@ -157,6 +202,7 @@ workspace.Live.DescendantAdded:Connect(function(dec)
         local dparent = dec.Parent
         local a = Instance.new("Highlight", dec.Parent)
         a.Name = "hdc" 
+        a.FillColor = VisualSettings.DCColor
         repeat
             task.wait()
         until dparent:FindFirstChild("Counter")==nil
@@ -277,7 +323,7 @@ end)
         if VisualSettings.ShowUlt == true then
             local uh = Instance.new("Highlight", dec.Parent.Parent.Character)
             uh.Name = "Hult"
-            uh.FillColor = Color3.fromRGB(255,255,0)
+            uh.FillColor = VisualSettings.UltColor
         end
     end
 end)
