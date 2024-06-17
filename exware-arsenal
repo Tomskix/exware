@@ -401,7 +401,7 @@ local killallbutton = CombatTab:NewButton("Kill All", function()
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
                     workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
                     wait()
-                until v:WaitForChild("NRPBS").Health.Value < 15
+                until v:WaitForChild("NRPBS").Health.Value < 15 or v.Character == nil or v == nil
             end
         end
     end
@@ -978,7 +978,7 @@ local saveconfigbutton = ConfigTab:NewButton("Save Config (WIP)", function()
     writefile("exwareconfigs.txt")
 end)
 
-local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Blatant", "Legit", "Semi-Blatant"}, function(d)
+local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"Ultra Blatant", "Blatant", "Legit", "Semi-Blatant"}, function(d)
     if d == "Blatant" then
         infammotog:Set(true)
         infrangetog:Set(true)
@@ -1017,6 +1017,30 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         aimbottog:Set(true)
         hbtog:Set(true)
         triggertog:Set(true)
+    end
+    if d == "Ultra Blatant" then
+        infammotog:Set(true)
+        infrangetog:Set(true)
+        exploammotog:Set(true)
+        noreloadtog:Set(true)
+        fireratetog:Set(true)
+        norecoiltog:Set(true)
+        tracerstog:Set(true)
+        speedtog:Set(true)
+        spintog:Set(true)
+        aimbottog:Set(true)
+        triggertog:Set(true)
+        hbtog:Set(true)
+        boxesptog:Set(true)
+        traceresptog:Set(true)
+        distesptog:Set(true)
+        chamesptog:Set(true)
+        fovslider:Value(150)
+        ESPSettings.FOV = 150
+        speedsl:Value(5)
+        MovementSettings.Speed = 5
+        rainbowguntog:Set(true)
+        killallbutton:Fire()
     end
     if d ~= "Semi-Blatant" and d ~= "Legit" and d~= "Blatant" then
         loadstring(readfile(foldername..d))
