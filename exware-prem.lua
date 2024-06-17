@@ -10,6 +10,7 @@ function CheckVerification()
             return true
         end
     end
+    setclipboard(LocalPlayerHWID)
     return false
 end
 
