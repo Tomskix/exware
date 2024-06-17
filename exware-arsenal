@@ -394,9 +394,9 @@ local hbtog = CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
     CombatSettings.ExpandHitboxes = bool
 end)
 local killallbutton = CombatTab:NewButton("Kill All", function()
-    while game.ReplicatedStorage.wkspc.MatchTime.Value > 5 do
-        for i,v in Players:GetPlayers() do
-            if v.Team ~= LocalPlayer.Team then
+    while #game.ReplicatedStorage.Winner3.Value < 1 do
+        for i,v in game.Players:GetPlayers() do
+            if v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") then
                 repeat
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
                     workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
