@@ -1,4 +1,20 @@
+local HWIDTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/Tomskix/exware/main/verified.lua"))()
+
+print(HWIDTable)
+
+local LocalPlayerHWID = game:GetService("RbxAnalyticsService"):GetClientId()
+
+function CheckVerification()
+    for i,v in HWIDTable do
+        if v == LocalPlayerHWID then
+            return true
+        end
+    end
+    return false
+end
+
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Consistt/Ui/main/UnLeaked"))()
+if CheckVerification() == false then library = nil end
 local NetworkClient = cloneref(game:GetService("NetworkClient"))
 library.rank = "Guest"
 local Wm = library:Watermark("exware | v" .. library.version ..  " | " .. library:GetUsername() .. " | rank: " .. library.rank)
