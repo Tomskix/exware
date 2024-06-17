@@ -4,14 +4,7 @@ local Camera = game:GetService("Workspace").CurrentCamera
 local HeadOffset = Vector3.new(0, 0.5, 0)
 local LegOffset = Vector3.new(0, 4, 0)
 local ArmOffset = Vector3.new(1, 0, 0)
-
-function Wallbang(person)
-    local personhb = person.Character.Head.Size
-    local Dist = (game.Players.LocalPlayer.Character.Head.Position - person.Character.Head.Position)
-    person.Character.Head.Size = person.Character.Head.Size + Dist 
-    wait(0.5)
-    person.Character.Head.Size = personhb
-end
+local KillAllToggle = false
 local spinning = false
 
 local player = game.Players.LocalPlayer
@@ -154,6 +147,8 @@ local LocalWSkin = LocalPlayer.Equipped
 local skinselector = SkinChangeTab:NewSelector("Change Knife Skin", "Select Skin", {}, function(d)
     LocalMelee.Value = d
 end)
+
+
 for i,v in AllMelees:GetChildren() do
     skinselector:AddOption(v.Name)
 end
@@ -393,18 +388,8 @@ local BalantSec = CombatTab:NewSection("Blatant")
 local hbtog = CombatTab:NewToggle("Expand Hitboxes", false, function(bool)
     CombatSettings.ExpandHitboxes = bool
 end)
-local killallbutton = CombatTab:NewButton("Kill All", function()
-    while #game.ReplicatedStorage.Winner3.Value < 1 do
-        for i,v in game.Players:GetPlayers() do
-            if v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") then
-                repeat
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
-                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
-                    wait()
-                until v:WaitForChild("NRPBS").Health.Value < 15 or v.Character == nil or v == nil
-            end
-        end
-    end
+local killalltogge = CombatTab:NewToggle("Kill All",false, function()
+    KillAllToggle = not KillAllToggle
 end)
 local NetworkClient = cloneref(game:GetService("NetworkClient"))
 CombatTab:NewToggle("Lagswitch", false, function(bool)
@@ -1040,7 +1025,7 @@ local cselect = ConfigTab:NewSelector("Preloaded Configs", "Choose a Config", {"
         speedsl:Value(5)
         MovementSettings.Speed = 5
         rainbowguntog:Set(true)
-        killallbutton:Fire()
+        killalltogge:Set(true)
     end
     if d ~= "Semi-Blatant" and d ~= "Legit" and d~= "Blatant" then
         loadstring(readfile(foldername..d))
@@ -1054,3 +1039,17 @@ while stepped < reach do
     cselect:AddOption(filetable[2])
     wait(0.1)
 end 
+
+while wait() do
+    if KillAllToggle == true then
+        for i,v in game.Players:GetPlayers() do
+            if v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChildWhichIsA("ForceField")==nil then
+                repeat
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
+                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
+                    wait()
+                until v:WaitForChild("NRPBS").Health.Value < 15 or v.Character == nil or v == nil or KillAllToggle == false or v.Character:FindFirstChildWhichIsA("ForceField")~=nil
+            end
+        end
+    end
+end
