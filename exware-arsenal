@@ -114,9 +114,10 @@ local AimbotCache = {
     MouseDown = false,
     target,
     Aimbotsize = 90,
-    UseCircle = true
+    UseCircle = true,
+    Predictions = false,
 }
-
+local PredictionCounter = 1
 local HWIDTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/Tomskix/exware/main/verified.lua"))()
 
 print(HWIDTable)
@@ -332,6 +333,12 @@ local aimbottog =CombatTab:NewToggle("Enable Aimbot", false, function(bool)
     if usecircle == true then
         AimbotCircle.Visible = bool
     end
+end)
+local predicttog = CombatTab:NewToggle("Enable Predictions", false, function(bool)
+    AimbotCache.Predictions = bool
+end)
+CombatTab:NewSlider("Prections Rate", "", true, "/", {min = 1, max = 25, default = 1}, function(value)
+    PredictionCounter = value
 end)
 CombatTab:NewToggle("Show Circle", true, function(bool)
     usecircle = bool
@@ -850,12 +857,16 @@ game:GetService("RunService").RenderStepped:Connect(function()
         LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity").Velocity = game.Players.LocalPlayer.Character.Humanoid.MoveDirection * bhopspeed
     end
     if AimbotCache.MouseDown and CombatSettings.Aimbot  then
-        if AimbotCache.target and AimbotCache.target:FindFirstChild("NRPBS").Health.Value > 0 then
+        if AimbotCache.target and AimbotCache.target:FindFirstChild("NRPBS").Health.Value > 0 and AimbotCache.Predictions == false then
             workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).Position)
         else
-            if not AimbotCache.target then
-                AimbotCache.target, cacaca = GetClosestPlayer(AimbotCache.Aimbotsize)
-            end 
+            if AimbotCache.target and AimbotCache.target:FindFirstChild("NRPBS").Health.Value > 0 and AimbotCache.Predictions == true then
+                workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).Position + (AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).AssemblyAngularVelocity * (PredictionCounter * 0.01) +  AimbotCache.target.Character:FindFirstChild(CombatSettings.HitPart).AssemblyLinearVelocity * (PredictionCounter * 0.01)))
+            else
+                if not AimbotCache.target then
+                    AimbotCache.target, cacaca = GetClosestPlayer(AimbotCache.Aimbotsize)
+                end 
+            end
         end
     end
     chr = game.Players.LocalPlayer.Character
