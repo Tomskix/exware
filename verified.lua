@@ -1,9 +1,6 @@
-function gethwid()
-local HWIDS = {
-    "DACFB76F-C1E0-4F03-87DD-64E14F012089",
+return {
+"DACFB76F-C1E0-4F03-87DD-64E14F012089",
 }
-return HWIDS
-end
-gethwid()
+
 
 
