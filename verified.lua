@@ -7,5 +7,6 @@ return {
 "nut",",
 "nutter",
 "MICKET (user msg)",
-"sigma",
+"sigma",,
+"ligma",
 }
