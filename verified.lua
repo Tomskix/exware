@@ -3,11 +3,4 @@ return {
 "8C0F749D-10D7-40D2-BBF4-1E675197B85A",
 "DACFB76F-C1E0-4F03-87DD-64E14F012089",
 "14F23D50-1372-4B47-BD24-ADD8E086CEA1",
-"ohloala",
-"nut",
-"nutter",
-"MICKET (user msg)",
-"sigma",
-"ligma",,
-    "grah (user msg)"
 }
