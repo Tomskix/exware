@@ -1071,7 +1071,7 @@ end
 while wait() do
     if KillAllToggle == true then
         for i,v in game.Players:GetPlayers() do
-            if v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChildWhichIsA("ForceField")==nil then
+            if v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChildWhichIsA("ForceField")==nil and v.Character:FindFirstChild("Gun")~=nil then
                 repeat
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Character.HumanoidRootPart.Position + Vector3.new(-2, 8, 0))
                     workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, v.Character.Head.Position)
