@@ -3,5 +3,9 @@ if game.PlaceId == 286090429 then
 else
   if game.PlaceId == 10449761463 then
      loadstring(game:HttpGet("https://raw.githubusercontent.com/Tomskix/exware/main/exware-prem.lua"))()
+  else
+    if game.PlaceId == 9391468976 then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Tomskix/exware/main/jjks"))()
+    end
   end
 end
